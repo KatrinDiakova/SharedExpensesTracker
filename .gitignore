@@ -1,0 +1,11 @@
+# Project exclude paths
+/.gradle/
+/Shared Expenses Tracker/task/build/
+/Shared Expenses Tracker/task/out/
+/Shared Expenses Tracker/task/out/production/classes/
+/Topics/Stream pipelines/The ten most frequent words/out/
+/Topics/Stream pipelines/The ten most frequent words/out/production/classes/
+/Topics/Stream pipelines/The total sum of canceled transactions/out/
+/Topics/Stream pipelines/The total sum of canceled transactions/out/production/classes/
+/Topics/Stream pipelines/Using streams many times/out/
+/Topics/Stream pipelines/Using streams many times/out/production/classes/
