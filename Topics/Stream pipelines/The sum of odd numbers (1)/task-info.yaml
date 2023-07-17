@@ -1,0 +1,43 @@
+type: code
+custom_name: The sum of odd numbers
+files:
+- name: src/Main.java
+  visible: true
+  text: |-
+    import java.util.Scanner;
+
+    class Main {
+
+        /**
+         * The method calculates the sum of odd numbers in the given range
+         *
+         * @param start of a range, start >= 0
+         * @param end of a range (inclusive), end >= start
+         *
+         * @return sum of odd numbers
+         */
+        public static long sumOfOddNumbersInRange(long start, long end) {
+            // write your code here
+        }
+
+        // Don't change the code below
+        public static void main(String[] args) {
+
+            Scanner scanner = new Scanner(System.in);
+
+            String[] line = scanner.nextLine().trim().split(" ");
+
+            long start = Integer.parseInt(line[0]);
+            long end = Integer.parseInt(line[1]);
+
+            System.out.println(sumOfOddNumbersInRange(start, end));
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2446#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Tue, 04 Jul 2023 15:31:34 UTC"
+record: -1
+submission_language: java17

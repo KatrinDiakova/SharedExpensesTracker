@@ -1,0 +1,21 @@
+<h2>Triple</h2>
+<div class="step-text">
+<p>Given an immutable class <code class="language-java">Triple</code>:</p>
+<pre><code class="language-java">final class Triple&lt;L, M, R&gt; {
+    private final L left;
+    private final M middle;
+    private final R right;
+
+    Triple(L left, M middle, R right) {
+        this.left = left;
+        this.middle = middle;
+        this.right = right;
+    }
+}</code></pre>
+<p>Here is a list of integers:</p>
+<pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(5, 3, 4, 1);</code></pre>
+<p>What triples does the <code class="language-java">set</code> contain?</p>
+<pre><code class="language-java">Set&lt;Triple&lt;Integer, Integer, String&gt;&gt; set = numbers.stream()
+        .map(val -&gt; new Triple&lt;&gt;(val, val * val, String.valueOf(val) + String.valueOf(val)))
+        .collect(Collectors.toSet());</code></pre>
+</div>

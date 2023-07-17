@@ -1,0 +1,24 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: "LocalDate.of(2017, 10, 11).withDayOfMonth(12)"
+- text: "LocalDate.of(2017, 1, 1).plusMonths(9).withDayOfMonth(12)"
+- text: "LocalDate.of(2018, 10, 12).minusYears(1)"
+- text: "LocalDate.of(2017, 10, 1).withDayOfYear(12)"
+- text: "LocalDate.of(2017, 12, 10)"
+files:
+- name: src/Task.java
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    public class Task {
+      public static void main(String[] args) {
+        // put your code here
+      }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2854#comment
+status: Solved
+record: -1
+local_check: false

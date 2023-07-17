@@ -1,0 +1,13 @@
+<h2>Flatten list of lists</h2>
+<div class="step-text">
+<p>Given a list of lists.</p>
+<pre><code class="language-java">List&lt;List&lt;Integer&gt;&gt; list = Arrays.asList(
+                Arrays.asList(1, 2, 3),
+                Arrays.asList(4, 5, 1),
+                Arrays.asList(8, 3, 2)
+);</code></pre>
+<p>What elements does the <code class="language-java">numbers</code> list contain?</p>
+<pre><code class="language-java">List&lt;Integer&gt; numbers = list.stream()
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());</code></pre>
+</div>

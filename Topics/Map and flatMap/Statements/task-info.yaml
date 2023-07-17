@@ -1,0 +1,23 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: It is an intermediate operation.
+- text: The method cannot transform elements of a stream to the same elements.
+- text: It takes a two-argument function as a parameter.
+- text: It returns another stream of the same size.
+files:
+- name: src/Task.java
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    public class Task {
+      public static void main(String[] args) {
+        // put your code here
+      }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2409#comment
+status: Solved
+record: -1
+local_check: false

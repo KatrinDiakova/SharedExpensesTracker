@@ -1,0 +1,25 @@
+type: choice
+is_multiple_choice: false
+options:
+- text: "1, 2, 3"
+- text: "1, 2, 3, 4, 5, 1, 8, 3, 2"
+- text: "1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 1, 4, 5, 1, 4, 5, 1, 8, 3, 2, 8, 3, 2, 8,\
+    \ 3, 2"
+- text: "1, 4, 8"
+- text: "1, 2, 3, 4, 5, 8"
+files:
+- name: src/Task.java
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    public class Task {
+      public static void main(String[] args) {
+        // put your code here
+      }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2412#comment
+status: Solved
+record: -1
+local_check: false

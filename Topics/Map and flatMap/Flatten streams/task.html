@@ -1,0 +1,9 @@
+<h2>Flatten streams</h2>
+<div class="step-text">
+<p>Given a list of integer numbers.</p>
+<pre><code class="language-java">List&lt;Integer&gt; numbers = Stream.of(3, 2, 4, 1).collect(Collectors.toList());</code></pre>
+<p>What numbers does the <code class="language-java">generated</code> list contain?</p>
+<pre><code class="language-java">List&lt;Integer&gt; generated = numbers.stream()
+        .flatMap(elem -&gt; Stream.concat(Stream.of(elem), Stream.of(elem)))
+        .collect(Collectors.toList());</code></pre>
+</div>

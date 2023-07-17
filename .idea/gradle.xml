@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/classes/java" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/generated/sources/annotationProcessor/java" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/generated/sources/headers/java" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/reports/tests" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/test-results" />
+            <option value="$PROJECT_DIR$/Shared Expenses Tracker/task/build/tmp" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Generating cats" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Making a stream finite" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Methods for creating infinite streams" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Powers of two" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Select output" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Theory" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/30 years before and after" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Convert numbers to days" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Find all mondays" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Getting information on a day" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/LocalDate class" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Similar date" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/The first and the last day of a month" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/The first day of a month or not" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/The last day of a month" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Theory" />
+            <option value="$PROJECT_DIR$/Topics/LocalDate/Working with dates" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Count words without repetitions" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Flatten list of lists" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Flatten streams" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Maximum of the absolute values" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Sorting the absolute values" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Statements" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Theory" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/Triple" />
+            <option value="$PROJECT_DIR$/Topics/Map and flatMap/map, flatMap, and mapTo" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Counting words" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Counting words (1)" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Possible pipelines" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Possible pipelines (1)" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Programming paradigms" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Programming paradigms (1)" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The peek method" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The sum of odd numbers" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The sum of odd numbers (1)" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The ten most frequent words" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The total number of employees" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/The total sum of canceled transactions" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Theory" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/Using streams many times" />
+            <option value="$PROJECT_DIR$/Topics/Stream pipelines/What is the result" />
+            <option value="$PROJECT_DIR$/util" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
