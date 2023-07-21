@@ -46,7 +46,7 @@ public class PurchaseProcessor implements CommandProcessor {
         }
     }
 
-    private void process(List<String> input,int index, Pattern PATTERN, Consumer<List<String>> action) {
+    private void process(List<String> input, int index, Pattern PATTERN, Consumer<List<String>> action) {
         Map<Boolean, List<String>> map = input.stream()
                 .skip(index + 4)
                 .flatMap(it -> PATTERN.matcher(it).results())

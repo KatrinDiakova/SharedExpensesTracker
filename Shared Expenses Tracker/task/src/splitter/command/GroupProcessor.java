@@ -29,7 +29,7 @@ public class GroupProcessor implements CommandProcessor {
             process(input, RegexPatterns.PLUS_PATTERN, newFinalListNames::addAll);
             process(input, RegexPatterns.MINUS_PATTERN, newFinalListNames::removeAll);
 
-            switch (command) {
+            switch (command) { // add enum
                 case "create" -> createGroup(groupName);
                 case "add" -> changeGroup(groupName);
                 case "remove" -> removeFromGroup(groupName);

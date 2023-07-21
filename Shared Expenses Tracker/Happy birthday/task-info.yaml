@@ -539,6 +539,9 @@ files:
 - name: src/splitter/util/RegexPatterns.java
   visible: true
   learner_created: true
+- name: src/splitter/command/GroupCommand.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11720#comment
 status: Solved
 feedback:

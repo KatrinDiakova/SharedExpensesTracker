@@ -25,11 +25,13 @@ public class BorrowRepayProcessor implements CommandProcessor {
                 date = DateUtil.getDate(input.get(0));
                 commandIndex = 1;
             }
-            String command = input.get(commandIndex);
+            Command command = Command.of(input.get(commandIndex));
+            //String command = input.get(commandIndex);
 
-            if ("borrow".equals(command) || "repay".equals(command)) {
-                NameKey nameKey = new NameKey(input.get(commandIndex + 1), input.get(commandIndex + 2));
-                BigDecimal amount = new BigDecimal((input.get(commandIndex + 3))).setScale(2, RoundingMode.HALF_EVEN);
+            if (Command.borrow == command || Command.repay == command) {
+                
+                NameKey nameKey = new NameKey(extractPersonOne(input, commandIndex), extractPersonTwo(input, commandIndex));
+                BigDecimal amount = new BigDecimal(extractAmount(input, commandIndex)).setScale(2, RoundingMode.HALF_EVEN); // добавить метод
                 process(date, command, amount, nameKey);
             }
         } catch (Exception e) {
@@ -37,7 +39,19 @@ public class BorrowRepayProcessor implements CommandProcessor {
         }
     }
 
-    private void process(LocalDate date, String command, BigDecimal amount, NameKey nameKey) {
+    private String extractPersonOne(List<String> input, int commandIndex) {
+        return input.get(commandIndex + 1);
+    }
+
+    private String extractPersonTwo(List<String> input, int commandIndex) {
+        return input.get(commandIndex + 2);
+    }
+
+    private String extractAmount(List<String> input, int commandIndex) {
+        return input.get(commandIndex + 2);
+    }
+
+    private void process(LocalDate date, Command command, BigDecimal amount, NameKey nameKey) {
 
         ArrayList<BalanceHistory> balanceHistoriesList = balanceHolder
                 .getHistoryMap()
@@ -49,22 +63,14 @@ public class BorrowRepayProcessor implements CommandProcessor {
                 .setScale(2, RoundingMode.HALF_EVEN);
 
         BigDecimal newBalance = BigDecimal.ZERO;
-        if (command.equals("borrow")) {
-            newBalance = calculateNewBalance(nameKey, currentAmount, amount, true);
-        } else if (command.equals("repay")) {
-            newBalance = calculateNewBalance(nameKey, currentAmount, amount, false);
+        boolean keyEquals = nameKey.getSortedKey().equals(nameKey.getKey());
+        switch (command) {
+            case borrow -> newBalance = keyEquals ? currentAmount.add(amount) : currentAmount.subtract(amount);
+            case repay -> newBalance = keyEquals ? currentAmount.subtract(amount) : currentAmount.add(amount);
         }
 
         balanceHolder.setAmount(nameKey.getSortedKey(), newBalance.setScale(2, RoundingMode.HALF_EVEN));
         balanceHistoriesList.add(new BalanceHistory(date, newBalance.setScale(2, RoundingMode.HALF_EVEN)));
         balanceHolder.setHistory(nameKey.getSortedKey(), balanceHistoriesList);
-    }
-
-    private BigDecimal calculateNewBalance(NameKey nameKey, BigDecimal currentAmount, BigDecimal amount, boolean isBorrow) {
-        if (nameKey.getSortedKey().equals(nameKey.getKey())) {
-            return isBorrow ? currentAmount.add(amount) : currentAmount.subtract(amount);
-        } else {
-            return isBorrow ? currentAmount.subtract(amount) : currentAmount.add(amount);
-        }
     }
 }

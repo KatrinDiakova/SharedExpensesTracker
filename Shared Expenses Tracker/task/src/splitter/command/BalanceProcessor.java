@@ -49,7 +49,7 @@ public class BalanceProcessor implements CommandProcessor {
                         BigDecimal totalAmount = balanceHolder.getHistoryMap().get(key).stream()
                                 .filter(it -> checkIsBalanceFromHistory(finalDate, it.getDate()))
                                 .sorted(Comparator.comparing(BalanceHistory::getDate))
-                                .reduce((first, second) -> second)//???
+                                .reduce((first, second) -> second)
                                 .map(BalanceHistory::getBalance)
                                 .orElse(BigDecimal.ZERO);
 
