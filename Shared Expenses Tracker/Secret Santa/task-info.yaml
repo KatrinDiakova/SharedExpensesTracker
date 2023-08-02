@@ -1,26 +1,5 @@
 type: edu
 files:
-- name: src/splitter/Main.java
-  visible: true
-  text: |
-    package splitter;
-
-
-    import java.util.*;
-
-    public class Main {
-
-        private static Scanner sc = new Scanner(System.in);
-
-        public static void main(String[] args) {
-            while (true) {
-                String input = sc.nextLine();
-                List<String> inputList = Arrays.asList(input.split(" "));
-                CommandParser.parseUserInput(inputList);
-            }
-        }
-    }
-  learner_created: false
 - name: test/SharedBillsSplitterTestStage4.java
   visible: false
   text: |
@@ -781,6 +760,48 @@ files:
         }
     }
   learner_created: false
+- name: src/splitter/Main.java
+  visible: true
+  learner_created: true
+- name: src/splitter/NameKey.java
+  visible: true
+  learner_created: true
+- name: src/splitter/BalanceHolder.java
+  visible: true
+  learner_created: true
+- name: src/splitter/GroupsHolder.java
+  visible: true
+  learner_created: true
+- name: src/splitter/BalanceHistory.java
+  visible: true
+  learner_created: true
+- name: src/splitter/CommandParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/BalanceType.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/GroupProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/Print.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/PurchaseProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/BorrowRepayProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/GroupCommand.java
+  visible: true
+  learner_created: true
+- name: src/splitter/util/RegexPatterns.java
+  visible: true
+  learner_created: true
+- name: test/SharedBillsSplitterTestStage3.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11721#comment
 status: Unchecked
 record: 4
