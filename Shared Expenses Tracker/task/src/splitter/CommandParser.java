@@ -27,7 +27,7 @@ public class CommandParser {
             System.out.println("Unknown command. Print help to show commands list");
             return false;
         }
-        // 2я проверка на наличие команды
+
         var inputList = List.of(input.split(INPUT_DELIMITER));
         processors.getOrDefault(command, System.err::println).process(inputList);
         return false;

@@ -25,17 +25,17 @@ public class BorrowRepayProcessor implements CommandProcessor {
                 date = DateUtil.getDate(input.get(0));
                 commandIndex = 1;
             }
+
             Command command = Command.of(input.get(commandIndex));
-            //String command = input.get(commandIndex);
 
             if (Command.borrow == command || Command.repay == command) {
-                
                 NameKey nameKey = new NameKey(extractPersonOne(input, commandIndex), extractPersonTwo(input, commandIndex));
-                BigDecimal amount = new BigDecimal(extractAmount(input, commandIndex)).setScale(2, RoundingMode.HALF_EVEN); // добавить метод
+                BigDecimal amount = new BigDecimal(extractAmount(input, commandIndex)).setScale(2, RoundingMode.HALF_EVEN);
                 process(date, command, amount, nameKey);
             }
         } catch (Exception e) {
             System.out.println("Illegal command arguments");
+
         }
     }
 
@@ -48,7 +48,7 @@ public class BorrowRepayProcessor implements CommandProcessor {
     }
 
     private String extractAmount(List<String> input, int commandIndex) {
-        return input.get(commandIndex + 2);
+        return input.get(commandIndex + 3);
     }
 
     private void process(LocalDate date, Command command, BigDecimal amount, NameKey nameKey) {
