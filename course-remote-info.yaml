@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/25279/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Fri, 21 Jul 2023 13:35:34 UTC"
+update_date: "Wed, 02 Aug 2023 23:26:37 UTC"
 stages:
 - id: 765
   step: 11718
@@ -51,10 +51,10 @@ topics:
     theory_id: 19510
   - title: Complex constructions in pseudocode
     theory_id: 20922
-  - title: Immutability
-    theory_id: 7929
   - title: Fixed-size array
     theory_id: 20078
+  - title: Immutability
+    theory_id: 7929
   - title: Dynamic array
     theory_id: 5357
   - title: Files
@@ -191,16 +191,16 @@ topics:
     theory_id: 3492
   - title: Generics and Object
     theory_id: 3493
+  - title: What are collections
+    theory_id: 3770
+  - title: The Collections Framework overview
+    theory_id: 3624
   - title: Lambda expressions
     theory_id: 11635
   - title: Method references
     theory_id: 3620
   - title: Functional interfaces
     theory_id: 11636
-  - title: What are collections
-    theory_id: 3770
-  - title: The Collections Framework overview
-    theory_id: 3624
   - title: ArrayList
     theory_id: 3567
   - title: The List interface
@@ -322,10 +322,10 @@ topics:
     theory_id: 13931
   - title: Libraries
     theory_id: 8504
-  - title: Frameworks
-    theory_id: 6701
   - title: External resources
     theory_id: 6216
+  - title: Frameworks
+    theory_id: 6701
   - title: Functional testing
     theory_id: 13438
   - title: Unit testing
@@ -350,10 +350,10 @@ topics:
     theory_id: 8312
   - title: Results ordering
     theory_id: 8627
-  - title: The NULL value
-    theory_id: 7907
   - title: Intro to MySQL
     theory_id: 16662
+  - title: The NULL value
+    theory_id: 7907
   - title: Introduction to JPA
     theory_id: 17125
   - title: Aggregate functions
