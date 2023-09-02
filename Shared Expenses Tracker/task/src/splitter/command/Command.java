@@ -10,7 +10,8 @@ public enum Command {
     purchase,
     secretSanta,
     cashback,
-    writeOff;
+    writeOff,
+    print;
 
     public static Command of(String value) {
         for (Command command : Command.values()) {

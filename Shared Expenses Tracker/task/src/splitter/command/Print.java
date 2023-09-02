@@ -1,19 +1,27 @@
 package splitter.command;
 
+import org.springframework.stereotype.Component;
 import splitter.BalanceHistory;
 import splitter.BalanceHolder;
 import splitter.GroupsHolder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class Print implements CommandProcessor {
     
     private final BalanceHolder balanceHolder = BalanceHolder.getInstance();
     private final GroupsHolder groupsHolder = GroupsHolder.getInstance();
-    
+
+    @Override
+    public List<Command> getCommand() {
+        return Collections.singletonList(Command.print);
+    }
+
     @Override
     public void process(List<String> input) {
 

@@ -35,7 +35,7 @@ public class GroupProcessor implements CommandProcessor {
             process(input, RegexPatterns.PLUS_PATTERN, newFinalListNames::addAll);
             process(input, RegexPatterns.MINUS_PATTERN, newFinalListNames::removeAll);
 
-            switch (command) { // add enum
+            switch (command) {
                 case "create" -> createGroup(groupName);
                 case "add" -> changeGroup(groupName);
                 case "remove" -> removeFromGroup(groupName);
@@ -47,16 +47,20 @@ public class GroupProcessor implements CommandProcessor {
 
     private void process(List<String> input, Pattern PATTERN, Consumer<List<String>> action) {
         Map<Boolean, List<String>> map = input.stream()
-                .skip(3)
+                .skip(3) // (+Bob, GIRLS, -Frank, Chuck)
+                // элементы потока проверяются на соответсвие патерну ( сначала PLUS_PATTERN, затем MINUS_PATTERN)
+                // для PLUS_PATTERN поток Bob, GIRLS, Chuck, для MINUS_PATTERN Frank
                 .flatMap(it -> PATTERN.matcher(it).results())
                 .map(MatchResult::group)
                 .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
 
+        // true GIRLS
         List<String> namesFromGroup = map.getOrDefault(true, Collections.emptyList())
                 .stream()
-                .flatMap(it -> groupMembers.getOrDefault(it, Collections.emptyList()).stream())
+                .flatMap(it -> groupMembers.getOrDefault(it, Collections.emptyList()).stream()) //заменить на базу данных
                 .toList();
 
+        // false Bob, Chuck
         List<String> names = map.getOrDefault(false, Collections.emptyList());
 
         List<String> finalNames = new ArrayList<>();
@@ -67,11 +71,13 @@ public class GroupProcessor implements CommandProcessor {
     }
 
     private void createGroup(String groupName) {
-        groupMembers.putIfAbsent(groupName, groupsHolder.getFinalListNames().stream().sorted().toList());
+        groupMembers.putIfAbsent(groupName, groupsHolder.getFinalListNames().stream().sorted().toList()); // сохраняем в базу данных имя группы и имена участников
     }
 
     private void changeGroup(String groupName) {
+        // проверяем существует ли введенная группа в базе
         if (groupMembers.containsKey(groupName)) {
+            // обновляет или добавляет значение в groupMembers для ключа groupName, объединяя текущий список имен с другим списком из groupsHolder.
             groupMembers.compute(groupName, (key, names) -> Stream.concat(names.stream(), groupsHolder.getFinalListNames().stream())
                     .sorted()
                     .collect(Collectors.toList()));
@@ -81,8 +87,10 @@ public class GroupProcessor implements CommandProcessor {
     }
 
     private void removeFromGroup(String groupName) {
+        // проверяем существует ли введенная группа в базе
         if (groupMembers.containsKey(groupName)) {
             groupMembers.compute(groupName, (key, names) -> names.stream()
+                    //сохраняете только те имена, которые отсутствуют в списке FinalListNames().
                     .filter(name -> !groupsHolder.getFinalListNames().contains(name))
                     .sorted()
                     .collect(Collectors.toList()));
