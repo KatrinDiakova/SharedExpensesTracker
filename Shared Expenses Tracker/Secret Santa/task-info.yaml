@@ -817,9 +817,6 @@ files:
 - name: src/resources/application.properties
   visible: true
   learner_created: true
-- name: src/splitter/SecretSantaApplication.java
-  visible: true
-  learner_created: true
 - name: src/splitter/entity/Groups.java
   visible: true
   learner_created: true
@@ -827,6 +824,9 @@ files:
   visible: true
   learner_created: true
 - name: src/splitter/repository/GroupsRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/SecretSantaApplication.java
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11721#comment
