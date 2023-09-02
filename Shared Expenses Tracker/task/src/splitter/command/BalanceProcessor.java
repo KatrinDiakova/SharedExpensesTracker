@@ -1,5 +1,6 @@
 package splitter.command;
 
+import org.springframework.stereotype.Component;
 import splitter.BalanceHistory;
 import splitter.BalanceHolder;
 import splitter.BalanceType;
@@ -9,13 +10,18 @@ import java.math.*;
 import java.time.LocalDate;
 import java.util.*;
 
-
+@Component
 public class BalanceProcessor implements CommandProcessor {
 
     public static final String KEY_DELIMITER = "-";
     private final BalanceHolder balanceHolder = BalanceHolder.getInstance();
 
     private BalanceType balanceType = BalanceType.close;
+
+    @Override
+    public List<Command> getCommand() {
+        return Collections.singletonList(Command.balance);
+    }
 
     @Override
     public void process(List<String> input) {
@@ -65,7 +71,6 @@ public class BalanceProcessor implements CommandProcessor {
     private static String buildRepaymentString(String[] name, BigDecimal totalAmount) {
 
         BigDecimal resultTotalAmount = totalAmount.setScale(2, RoundingMode.HALF_EVEN);
-
 
         boolean negate = totalAmount.signum() == -1;
         if (negate) {

@@ -1,16 +1,33 @@
 package splitter;
+/**
+ * [date] borrow PersonOne PersonTwo amount
+ * [date] repay PersonOne PersonTwo amount
+ * [date] balance [open|close]
+ * group [create|add|remove|show] GROUPNAME [(list of [+|-] persons | GROUPS)]
+ * [date] purchase Person itemName amount [(list of [+|-] persons | GROUPS)]
+ */
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
-public class Main {
+@Component
+public class Main implements CommandLineRunner {
 
-    private static final Scanner SCANNER = new Scanner(System.in);
-    private static final CommandParser PARSER = new CommandParser();
+    private final Scanner SCANNER = new Scanner(System.in);
+    private final CommandParser commandParser;
 
-    public static void main(String[] args) {
+    @Autowired
+    public Main(CommandParser commandParser) {
+        this.commandParser = commandParser;
+    }
+
+    @Override
+    public void run(String... args) {
         boolean needExit = false;
         while (!needExit) {
-            needExit = PARSER.parseUserInput(SCANNER.nextLine());
+            needExit = commandParser.parseUserInput(SCANNER.nextLine());
         }
     }
 }

@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/25279/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Wed, 02 Aug 2023 23:26:37 UTC"
+update_date: "Fri, 01 Sep 2023 01:23:47 UTC"
 stages:
 - id: 765
   step: 11718
@@ -35,16 +35,16 @@ topics:
     theory_id: 16927
   - title: Units of information
     theory_id: 6865
-  - title: "Write, compile, and run"
-    theory_id: 3739
-  - title: "JVM, JRE, and JDK"
-    theory_id: 3499
   - title: Introduction to Operating systems
     theory_id: 9704
   - title: Command line overview
     theory_id: 8977
+  - title: "Write, compile, and run"
+    theory_id: 3739
   - title: Parameters and Options
     theory_id: 9746
+  - title: "JVM, JRE, and JDK"
+    theory_id: 3499
   - title: Pseudocode
     theory_id: 15090
   - title: Pseudocode basics
@@ -53,16 +53,12 @@ topics:
     theory_id: 20922
   - title: Fixed-size array
     theory_id: 20078
-  - title: Immutability
-    theory_id: 7929
   - title: Dynamic array
     theory_id: 5357
+  - title: Immutability
+    theory_id: 7929
   - title: Files
     theory_id: 13025
-  - title: Computer programming
-    theory_id: 8739
-  - title: Paradigms
-    theory_id: 15860
   - title: Introduction to Java
     theory_id: 3500
   - title: Basic literals
@@ -123,14 +119,14 @@ topics:
     theory_id: 3511
   - title: Arrays as parameters
     theory_id: 3594
-  - title: Iterating over arrays
-    theory_id: 3602
   - title: Characters
     theory_id: 3514
   - title: String
     theory_id: 3523
   - title: Final variables
     theory_id: 7427
+  - title: Iterating over arrays
+    theory_id: 3602
   - title: Errors in programs
     theory_id: 3536
   - title: What is an exception
@@ -141,14 +137,14 @@ topics:
     theory_id: 3614
   - title: Package
     theory_id: 3621
+  - title: Java Archive
+    theory_id: 4311
   - title: Hierarchy of exceptions
     theory_id: 3570
   - title: Exception handling
     theory_id: 3552
   - title: Build tools
     theory_id: 4284
-  - title: Java Archive
-    theory_id: 4311
   - title: Gradle basics
     theory_id: 5075
   - title: Basic project with Gradle
@@ -157,8 +153,6 @@ topics:
     theory_id: 7917
   - title: What is a bug
     theory_id: 5504
-  - title: Processing strings
-    theory_id: 3551
   - title: Introduction to databases
     theory_id: 8497
   - title: What is SQL
@@ -173,6 +167,8 @@ topics:
     theory_id: 7392
   - title: SELECT FROM statement
     theory_id: 8611
+  - title: Processing strings
+    theory_id: 3551
   - title: Introduction to logging
     theory_id: 5538
   - title: Debugging techniques
@@ -191,30 +187,30 @@ topics:
     theory_id: 3492
   - title: Generics and Object
     theory_id: 3493
+  - title: Lambda expressions
+    theory_id: 11635
   - title: What are collections
     theory_id: 3770
   - title: The Collections Framework overview
     theory_id: 3624
-  - title: Lambda expressions
-    theory_id: 11635
-  - title: Method references
-    theory_id: 3620
-  - title: Functional interfaces
-    theory_id: 11636
   - title: ArrayList
     theory_id: 3567
   - title: The List interface
     theory_id: 3581
+  - title: Method references
+    theory_id: 3620
+  - title: Functional interfaces
+    theory_id: 11636
   - title: Standard functional interfaces
     theory_id: 3623
   - title: BigInteger
     theory_id: 3508
   - title: Defining classes
     theory_id: 3618
-  - title: Constructor
-    theory_id: 3535
   - title: Instance methods
     theory_id: 3495
+  - title: Constructor
+    theory_id: 3535
   - title: Access modifiers
     theory_id: 3589
   - title: Getters and setters
@@ -279,10 +275,10 @@ topics:
   - title: BigDecimal
     theory_id: 13511
   2:
-  - title: Optional
-    theory_id: 9699
   - title: The Set interface
     theory_id: 3575
+  - title: Optional
+    theory_id: 9699
   3:
   - title: World Wide Web
     theory_id: 6633
@@ -322,24 +318,24 @@ topics:
     theory_id: 13931
   - title: Libraries
     theory_id: 8504
-  - title: External resources
-    theory_id: 6216
   - title: Frameworks
     theory_id: 6701
+  - title: External resources
+    theory_id: 6216
   - title: Functional testing
     theory_id: 13438
   - title: Unit testing
     theory_id: 7545
   - title: Dependency injection
     theory_id: 20580
+  - title: YAML
+    theory_id: 12722
   - title: Relational Data Model
     theory_id: 13785
   - title: Logic and comparison expressions
     theory_id: 8619
   - title: Interfaces
     theory_id: 9640
-  - title: YAML
-    theory_id: 12722
   - title: JSON
     theory_id: 6854
   - title: XML
@@ -348,10 +344,10 @@ topics:
     theory_id: 8262
   - title: Object-Relational Mapping (ORM)
     theory_id: 8312
-  - title: Results ordering
-    theory_id: 8627
   - title: Intro to MySQL
     theory_id: 16662
+  - title: Results ordering
+    theory_id: 8627
   - title: The NULL value
     theory_id: 7907
   - title: Introduction to JPA
@@ -377,14 +373,16 @@ topics:
     theory_id: 3611
   - title: "Hashing: overview"
     theory_id: 9831
-  - title: Ordering and total order
-    theory_id: 9253
   - title: Hash function
     theory_id: 30143
   - title: Hash table
     theory_id: 13054
+  - title: Ordering and total order
+    theory_id: 9253
   - title: Function composition
     theory_id: 3580
+  - title: The Map interface
+    theory_id: 3558
   - title: Comparator
     theory_id: 12966
   - title: Functional data processing with streams
@@ -397,6 +395,8 @@ topics:
     theory_id: 3569
   - title: Collectors
     theory_id: 3613
+  - title: Grouping collectors
+    theory_id: 10512
   - title: Infinite streams
     theory_id: 10180
   - title: Taking elements
@@ -405,10 +405,6 @@ topics:
     theory_id: 8407
   - title: Stream pipelines
     theory_id: 3612
-  - title: The Map interface
-    theory_id: 3558
-  - title: Grouping collectors
-    theory_id: 10512
   5:
   - title: Decrease and conquer
     theory_id: 14669

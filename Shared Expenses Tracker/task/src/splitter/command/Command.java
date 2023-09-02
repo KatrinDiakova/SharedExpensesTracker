@@ -3,11 +3,14 @@ package splitter.command;
 public enum Command {
     balance,
     borrow,
+    repay,
     exit,
-    group,
     help,
+    group,
     purchase,
-    repay;
+    secretSanta,
+    cashback,
+    writeOff;
 
     public static Command of(String value) {
         for (Command command : Command.values()) {
@@ -16,7 +19,5 @@ public enum Command {
             }
         }
         return null;
-        //System.err.println("Unknown command. Print help to show commands list");
-        //throw new IllegalArgumentException("Unknown command: " + value);
     }
 }

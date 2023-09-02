@@ -793,13 +793,37 @@ files:
 - name: src/splitter/command/BorrowRepayProcessor.java
   visible: true
   learner_created: true
-- name: src/splitter/command/GroupCommand.java
-  visible: true
-  learner_created: true
 - name: src/splitter/util/RegexPatterns.java
   visible: true
   learner_created: true
 - name: test/SharedBillsSplitterTestStage3.java
+  visible: true
+  learner_created: true
+- name: src/splitter/util/DateUtil.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/CommandProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/Command.java
+  visible: true
+  learner_created: true
+- name: src/splitter/command/BalanceProcessor.java
+  visible: true
+  learner_created: true
+- name: build.gradle
+  visible: true
+  learner_created: true
+- name: src/resources/application.properties
+  visible: true
+  learner_created: true
+- name: src/splitter/SecretSantaApplication.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Groups.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Members.java
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11721#comment

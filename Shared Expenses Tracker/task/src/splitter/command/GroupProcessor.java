@@ -1,5 +1,6 @@
 package splitter.command;
 
+import org.springframework.stereotype.Component;
 import splitter.GroupsHolder;
 import splitter.util.RegexPatterns;
 
@@ -8,11 +9,16 @@ import java.util.function.Consumer;
 import java.util.regex.*;
 import java.util.stream.*;
 
-
+@Component
 public class GroupProcessor implements CommandProcessor {
 
     private final GroupsHolder groupsHolder = GroupsHolder.getInstance();
     private final Map<String, List<String>> groupMembers = groupsHolder.getGroupMembers();
+
+    @Override
+    public List<Command> getCommand() {
+        return Collections.singletonList(Command.group);
+    }
 
     @Override
     public void process(List<String> input) {

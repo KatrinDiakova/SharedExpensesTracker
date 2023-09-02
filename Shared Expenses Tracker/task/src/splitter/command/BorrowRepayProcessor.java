@@ -1,5 +1,6 @@
 package splitter.command;
 
+import org.springframework.stereotype.Component;
 import splitter.BalanceHistory;
 import splitter.BalanceHolder;
 import splitter.NameKey;
@@ -9,11 +10,15 @@ import java.math.*;
 import java.time.LocalDate;
 import java.util.*;
 
-
-
+@Component
 public class BorrowRepayProcessor implements CommandProcessor {
 
     private final BalanceHolder balanceHolder = BalanceHolder.getInstance();
+
+    @Override
+    public List<Command> getCommand() {
+        return List.of(Command.borrow, Command.repay);
+    }
 
     @Override
     public void process(List<String> input) {

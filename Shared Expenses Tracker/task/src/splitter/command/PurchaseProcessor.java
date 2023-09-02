@@ -1,9 +1,8 @@
 package splitter.command;
 
+import org.springframework.stereotype.Component;
 import splitter.*;
-import splitter.util.DateUtil;
-import splitter.util.RegexPatterns;
-
+import splitter.util.*;
 import java.math.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -12,6 +11,7 @@ import java.util.regex.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Component
 public class PurchaseProcessor implements CommandProcessor {
 
     private final BalanceHolder balanceHolder = BalanceHolder.getInstance();
@@ -19,6 +19,11 @@ public class PurchaseProcessor implements CommandProcessor {
 
     BigDecimal minimumAmount = new BigDecimal("0.01");
     boolean haveRemainder = false;
+
+    @Override
+    public List<Command> getCommand() {
+        return Collections.singletonList(Command.purchase);
+    }
 
     @Override
     public void process(List<String> input) {
