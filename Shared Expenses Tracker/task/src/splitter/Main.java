@@ -5,6 +5,7 @@ package splitter;
  * [date] balance [open|close]
  * group [create|add|remove|show] GROUPNAME [(list of [+|-] persons | GROUPS)]
  * [date] purchase Person itemName amount [(list of [+|-] persons | GROUPS)]
+ * [date] cashback Person itemName amount [(list of [+|-] persons | GROUPS)]
  */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

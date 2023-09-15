@@ -1,0 +1,6 @@
+2023-09-04 20:23:07 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MEMBER" not found; SQL statement:
+DELETE FROM Member WHERE MEMBER_ID IN (SELECT m.MEMBER_ID FROM group_members AS g RIGHT JOIN Member AS m ON g.member_id = m.member_id WHERE g.member_id IS NULL) [42102-200]
+2023-09-04 20:45:46 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MEMBER" not found; SQL statement:
+DELETE FROM Member WHERE MEMBER_ID IN (SELECT m.MEMBER_ID FROM group_members AS g RIGHT JOIN Member AS m ON g.member_id = m.member_id WHERE g.member_id IS NULL) [42102-200]

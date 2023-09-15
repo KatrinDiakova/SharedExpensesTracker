@@ -1,17 +1,17 @@
-package splitter.command;
+package splitter;
 
 public enum Command {
     balance,
     borrow,
-    repay,
+    cashBack,
     exit,
-    help,
     group,
+    help,
     purchase,
+    repay,
     secretSanta,
-    cashback,
-    writeOff,
-    print;
+    writeOff;
+    //clear;
 
     public static Command of(String value) {
         for (Command command : Command.values()) {

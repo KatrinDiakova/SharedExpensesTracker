@@ -763,52 +763,16 @@ files:
 - name: src/splitter/Main.java
   visible: true
   learner_created: true
-- name: src/splitter/NameKey.java
-  visible: true
-  learner_created: true
-- name: src/splitter/BalanceHolder.java
-  visible: true
-  learner_created: true
-- name: src/splitter/GroupsHolder.java
-  visible: true
-  learner_created: true
-- name: src/splitter/BalanceHistory.java
-  visible: true
-  learner_created: true
 - name: src/splitter/CommandParser.java
   visible: true
   learner_created: true
 - name: src/splitter/BalanceType.java
   visible: true
   learner_created: true
-- name: src/splitter/command/GroupProcessor.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/Print.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/PurchaseProcessor.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/BorrowRepayProcessor.java
-  visible: true
-  learner_created: true
 - name: src/splitter/util/RegexPatterns.java
   visible: true
   learner_created: true
-- name: test/SharedBillsSplitterTestStage3.java
-  visible: true
-  learner_created: true
 - name: src/splitter/util/DateUtil.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/CommandProcessor.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/Command.java
-  visible: true
-  learner_created: true
-- name: src/splitter/command/BalanceProcessor.java
   visible: true
   learner_created: true
 - name: build.gradle
@@ -820,15 +784,138 @@ files:
 - name: src/splitter/entity/Groups.java
   visible: true
   learner_created: true
-- name: src/splitter/entity/Members.java
-  visible: true
-  learner_created: true
 - name: src/splitter/repository/GroupsRepository.java
   visible: true
   learner_created: true
 - name: src/splitter/SecretSantaApplication.java
   visible: true
   learner_created: true
+- name: src/splitter/repository/MembersRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Members.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/GroupService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/PurchaseService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Transactions.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Balance.java
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/BalanceRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/TransactionsRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/BalanceService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/BalanceParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/BorrowRepayParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/GroupParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/BorrowRepayService.java
+  visible: true
+  learner_created: true
+- name: database_set.mv.db
+  visible: true
+  learner_created: true
+- name: src/splitter/service/ClearService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/WriteOffService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/PurchaseCashbackParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/CashbackService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/AmountCalculator.java
+  visible: true
+  learner_created: true
+- name: src/splitter/util/NameKey.java
+  visible: true
+  learner_created: true
+- name: src/splitter/Command.java
+  visible: true
+  learner_created: true
+- name: src/splitter/CommandProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/SecretSanta.java
+  visible: true
+  learner_created: true
+- name: database_project.mv.db
+  visible: true
+  learner_created: true
+- name: test_DataB.mv.db
+  visible: true
+  learner_created: true
+- name: testDB.mv.db
+  visible: true
+  learner_created: true
+- name: testDB1.mv.db
+  visible: true
+  learner_created: true
+- name: testDB122.mv.db
+  visible: true
+  learner_created: true
+- name: testDB123.mv.db
+  visible: true
+  learner_created: true
+- name: testDB102.mv.db
+  visible: true
+  learner_created: true
+- name: testDB1021.mv.db
+  visible: true
+  learner_created: true
+- name: testDB10215.mv.db
+  visible: true
+  learner_created: true
+- name: testDB102155.mv.db
+  visible: true
+  learner_created: true
+- name: testDB1021555.mv.db
+  visible: true
+  learner_created: true
+- name: testDB10241555.mv.db
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11721#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #14
+
+    Program should include Bob, Chuck and persons from GIRLS, also Frank should be excluded
+
+    Please find below the output of your program during this failed test.
+    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.
+
+    ---
+
+    &gt; group create GIRLS (Ann, Diana)
+    Group already exist
+    &gt; group create TEAM (+Bob, GIRLS, -Frank, Chuck)
+    Group already exist
+    &gt; group show TEAM
+    Ann
+    Bob
+    Diana
+    Elon
+  time: "Fri, 15 Sep 2023 01:48:48 UTC"
 record: 4

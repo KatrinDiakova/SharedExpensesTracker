@@ -1,4 +1,6 @@
-package splitter.command;
+package splitter;
+
+import splitter.Command;
 
 import java.util.Collections;
 import java.util.List;

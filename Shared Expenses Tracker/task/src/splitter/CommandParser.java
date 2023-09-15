@@ -2,7 +2,6 @@ package splitter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import splitter.command.*;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -35,7 +34,6 @@ public class CommandParser {
             System.out.println("Unknown command. Print help to show commands list");
             return false;
         }
-
         var inputList = List.of(input.split(INPUT_DELIMITER));
         processors.getOrDefault(command, System.err::println).process(inputList);
         return false;

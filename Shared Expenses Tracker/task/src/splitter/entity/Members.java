@@ -1,8 +1,8 @@
 package splitter.entity;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Members {
@@ -12,15 +12,23 @@ public class Members {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "member_name")
+    @Column(name = "member_name", unique = true)
     private String memberName;
 
     @ManyToMany(mappedBy = "members")
-    private List<Groups> groups = new ArrayList<>();
+    private Set<Groups> groups = new HashSet<>();
 
     public Members() {}
 
     public Members(String memberName) {
         this.memberName = memberName;
+    }
+
+    public Set<Groups> getGroups() { // получишь набор групп, в которых состоит member
+        return groups;
+    }
+
+    public String getMemberName() {
+        return memberName;
     }
 }
