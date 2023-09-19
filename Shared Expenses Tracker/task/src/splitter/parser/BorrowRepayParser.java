@@ -46,7 +46,6 @@ public class BorrowRepayParser implements CommandProcessor {
                 borrowRepayService.process(date, command, amount, personOne, personTwo);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Illegal command arguments");
 
         }

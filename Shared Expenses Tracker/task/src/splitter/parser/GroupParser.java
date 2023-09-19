@@ -48,7 +48,6 @@ public class GroupParser implements CommandProcessor {
                 default -> throw new IllegalArgumentException();
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Illegal command arguments");
         }
     }

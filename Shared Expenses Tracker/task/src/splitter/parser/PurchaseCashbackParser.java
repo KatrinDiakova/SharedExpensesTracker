@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import splitter.Command;
 import splitter.CommandProcessor;
-import splitter.entity.Members;
 import splitter.service.CashbackService;
 import splitter.service.GroupService;
 import splitter.service.PurchaseService;
@@ -58,8 +57,6 @@ public class PurchaseCashbackParser implements CommandProcessor {
                 case purchase -> purchaseService.process(date, payerMember, totalPrice, temporary);
                 case cashBack -> cashbackService.process(date, payerMember, totalPrice, temporary);
             }
-//        } catch (IllegalArgumentException e) {
-//            System.out.println(e.getMessage());
         } catch (Exception e) {
             System.out.println("Illegal command arguments");
         }
