@@ -1,11 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: for
-- text: infiniteStream
-- text: generate
-- text: stream
-- text: iterate
+is_multiple_choice: false
 files:
 - name: src/Task.java
   visible: true

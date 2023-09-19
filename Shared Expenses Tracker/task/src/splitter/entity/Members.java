@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "Members")
 public class Members {
 
     @Id
@@ -30,5 +31,8 @@ public class Members {
 
     public String getMemberName() {
         return memberName;
+    }
+
+    public void setMemberName(String name) {
     }
 }

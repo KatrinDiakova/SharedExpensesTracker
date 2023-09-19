@@ -18,7 +18,7 @@ public class Groups {
             name = "group_members",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id"))
-    private final List<Members> members = new ArrayList<>();
+    private final Set<Members> members = new HashSet<>();
 
     public Groups() {}
 
@@ -26,7 +26,7 @@ public class Groups {
         this.groupName = groupName;
     }
 
-    public List<Members> getMembers() {
+    public Set<Members> getMembers() {
         return members;
     }
 
@@ -36,6 +36,21 @@ public class Groups {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    public void setMembers(Set<Members> members) {
+        if (members != null) {
+            this.members.clear();
+            this.members.addAll(members);
+        }
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }
 

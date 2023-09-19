@@ -19,8 +19,6 @@ import java.util.*;
 @Service
 public class PurchaseService {
 
-    BigDecimal minimumAmount = new BigDecimal("0.01");
-
     private final BalanceRepository balanceRepository;
     private final MembersRepository membersRepository;
     private final TransactionsRepository transactionsRepository;
@@ -36,7 +34,7 @@ public class PurchaseService {
 
     @Transactional
     public void process(LocalDate date, String payerPerson, BigDecimal totalPrice, Set<String> temporary) {
-        BigDecimal quantityPerson = new BigDecimal(temporary.size()); // 3 количество учасников транзакции
+        BigDecimal quantityPerson = new BigDecimal(temporary.size()); // 3 count members of transaction
         AmountCalculator calculator = new AmountCalculator(totalPrice, temporary, payerPerson);
 
         BigDecimal sharedAmount = calculator.calcSharedAmount(quantityPerson);
@@ -62,7 +60,7 @@ public class PurchaseService {
                     newAmount = keyEquals ? currentAmount.subtract(sharedAmount) : currentAmount.add(sharedAmount);
 
                     if (haveRemainder && name.equals(extraPayers.peek())) {
-                        newAmount = keyEquals ? newAmount.subtract(minimumAmount) : newAmount.add(minimumAmount);
+                        newAmount = keyEquals ? newAmount.subtract(calculator.getMinimumAmount()) : newAmount.add(calculator.getMinimumAmount());
                         extraPayers.remove();
                     }
                     balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));

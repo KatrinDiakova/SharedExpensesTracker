@@ -1,10 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: count
-- text: forEach
-- text: max
-- text: findAny
 files:
 - name: src/Task.java
   visible: true

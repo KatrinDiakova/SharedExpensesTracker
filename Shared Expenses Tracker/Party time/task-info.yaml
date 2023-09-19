@@ -74,417 +74,6 @@ files:
         }
     }
   learner_created: false
-- name: src/splitter/Balance.java
-  visible: true
-  text: |-
-    package splitter;
-    import java.math.BigDecimal;
-    import java.math.RoundingMode;
-    import java.time.LocalDate;
-    import java.util.*;
-
-    public class Balance {
-
-        private static String type = "close";
-
-        public void parceData(List<String> input, Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            Date.index = 0;
-            LocalDate date = Date.getDate(input);
-            if (input.size() > Date.index + 1) {
-                if (input.get(Date.index + 1).equals("open") || input.get(Date.index + 1).equals("close")) {
-                    type = input.get(Date.index + 1);
-                }
-            }
-            processBalance(date, balanceAmount, balanceHistory);
-        }
-
-        private static void processBalance(LocalDate inputDate, Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                List<String> repayment = new ArrayList<>();
-                for (var key : balanceAmount.keySet()) {
-                    String[] name = key.split("-");
-                    ArrayList<BalanceHistory> history = balanceHistory.get(key);
-                    history.sort(Comparator.comparing(BalanceHistory::getDate));
-
-                    if (type.equals("open")) {
-                        inputDate = inputDate.withDayOfMonth(1);
-                    }
-                    BigDecimal totalAmount = BigDecimal.ZERO;
-                    for (BalanceHistory balanceHist : history) {
-                        LocalDate balanceDate = balanceHist.getDate();
-                        if (type.equals("close") && !balanceDate.isAfter(inputDate) ||
-                                type.equals("open") && balanceDate.isBefore(inputDate)) {
-                            totalAmount = balanceHist.getBalance();
-                        }
-                    }
-                    if (totalAmount.signum() == 0) {
-                        repayment.add("No repayments");
-                    } else {
-                        if (totalAmount.signum() == -1) {
-                            repayment.add(String.format("%s owes %s %s", name[1], name[0], totalAmount.negate().setScale(2, RoundingMode.HALF_EVEN)));
-                        } else {
-                            repayment.add(String.format("%s owes %s %s", name[0], name[1], totalAmount.setScale(2, RoundingMode.HALF_EVEN)));
-                        }
-                    }
-                }
-                Collections.sort(repayment);
-                for (String result : repayment) {
-                    System.out.println(result);
-                }
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments" + e);
-            }
-        }
-    }
-  learner_created: false
-- name: src/splitter/Purchase.java
-  visible: true
-  text: |+
-    package splitter;
-
-    import java.math.*;
-    import java.time.LocalDate;
-    import java.util.*;
-    import java.util.regex.*;
-
-    import static java.util.regex.Pattern.compile;
-
-    public class Purchase {
-
-        BigDecimal minimumAmount = new BigDecimal("0.01");
-        boolean haveRemainder = false;
-        int extraPayers;
-
-        void parceData(List<String> input, Map<String, BigDecimal> balanceAmount,
-                       Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                Date.index = 0;
-                LocalDate date = Date.getDate(input);
-                String payerPerson = input.get(Date.index + 1);
-                BigDecimal totalPrice = new BigDecimal(input.get(Date.index + 3));
-
-                Set<String> temporary = new TreeSet<>();
-                Pattern namePattern = Pattern.compile("(?:(?<=\\+)|(?<![-\\w]))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = Date.index + 4; i < input.size(); i++) {
-                    Matcher matcherAdd = namePattern.matcher(input.get(i));
-                    while (matcherAdd.find()) {
-                        if (matcherAdd.group().matches("[A-Z]+\\b")) {
-                            List<String> names = Group.groupMap.get(matcherAdd.group());
-                            if (names.isEmpty()) {
-                                System.out.println("Group is empty");
-                            } else {
-                                temporary.addAll(names);
-                            }
-                        } else {
-                            temporary.add(matcherAdd.group());
-                        }
-                    }
-                }
-
-                Pattern patternName = Pattern.compile("(?:(?<=\\-))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = Date.index + 4; i < input.size(); i++) {
-                    Matcher matcherRemove = patternName.matcher(input.get(i));
-                    while (matcherRemove.find()) {
-                        if (matcherRemove.group().matches("[A-Z]+\\b")) {
-                            List<String> names = Group.groupMap.get(matcherRemove.group());
-                            names.forEach(temporary::remove);
-                        } else {
-                            temporary.remove(matcherRemove.group());
-                        }
-                    }
-                }
-                haveRemainder = false;
-                processPurchase(date, payerPerson, totalPrice, temporary, balanceAmount, balanceHistory);
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-
-        void processPurchase(LocalDate date, String payerPerson, BigDecimal totalPrice, Set<String> temporary, Map<String,
-                BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-
-            //if (Group.groupMap.containsKey(groupName)) {
-            BigDecimal remainder;
-            //List<String> names = Group.groupMap.get(groupName);
-
-            BigDecimal quantityPerson = new BigDecimal(temporary.size());
-            BigDecimal sharedAmount = totalPrice.divide(quantityPerson, RoundingMode.FLOOR);
-
-            if (!totalPrice.equals(sharedAmount.multiply(quantityPerson))) {
-                remainder = totalPrice.subtract(sharedAmount.multiply(quantityPerson));
-                extraPayers = remainder.divide(minimumAmount, RoundingMode.DOWN).intValue();
-                haveRemainder = true;
-
-            }
-            int count = 0;
-            for (String name : temporary) {
-                if (!name.equals(payerPerson)) {
-                    String[] array = {payerPerson, name};
-                    String nameKey = array[0] + "-" + array[1];
-                    Arrays.sort(array);
-                    String nameKeySort = array[0] + "-" + array[1];
-                    ArrayList<BalanceHistory> balanceList = balanceHistory.getOrDefault(nameKeySort, new ArrayList<>());
-                    BigDecimal newBalance;
-                    BigDecimal currentBalance = balanceAmount.getOrDefault(nameKeySort, BigDecimal.ZERO);
-                    newBalance = nameKeySort.equals(nameKey) ? currentBalance.subtract(sharedAmount) : currentBalance.add(sharedAmount);
-
-                    if (haveRemainder && count < extraPayers) {
-                        newBalance = nameKeySort.equals(nameKey) ? newBalance.subtract(minimumAmount) : newBalance.add(minimumAmount);
-                        count++;
-                    }
-                    balanceAmount.put(nameKeySort, newBalance);
-                    balanceList.add(new BalanceHistory(date, newBalance));
-                    balanceHistory.put(nameKeySort, balanceList);
-                }
-            }
-            //} else {
-            //System.out.println("Group doesn't exist");
-            //}
-        }
-    }
-
-
-
-  learner_created: false
-- name: src/splitter/Date.java
-  visible: true
-  text: |-
-    package splitter;
-
-    import java.time.LocalDate;
-    import java.time.format.DateTimeFormatter;
-    import java.util.List;
-
-    public class Date {
-
-        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        static int index;
-
-        static LocalDate getDate(List<String> input) {
-            LocalDate date;
-            if (input.get(0).matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
-                date = LocalDate.parse(input.get(0), formatter);
-                index = 1;
-            } else {
-                date = LocalDate.now();
-            }
-            return date;
-        }
-    }
-  learner_created: false
-- name: src/splitter/BorrowRepay.java
-  visible: true
-  text: |
-    package splitter;
-
-    import java.math.BigDecimal;
-    import java.math.RoundingMode;
-    import java.time.*;
-    import java.util.*;
-    import java.util.regex.Matcher;
-    import java.util.regex.Pattern;
-
-    public class BorrowRepay {
-
-        public void parceData(List<String> input, Map<String, BigDecimal> balanceAmount,
-                              Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                Date.index = 0;
-                LocalDate date = Date.getDate(input);
-                String type = input.get(Date.index);
-                String personOne = input.get(Date.index + 1);
-                String personTwo = input.get(Date.index + 2);
-                BigDecimal amount = new BigDecimal(input.get(Date.index + 3)).setScale(2, RoundingMode.DOWN);
-                String[] names = {personOne, personTwo};
-                String nameKey = names[0] + "-" + names[1];
-                Arrays.sort(names);
-                String nameKeySort = names[0] + "-" + names[1];
-
-                processTransaction(type, amount, nameKeySort, date, nameKey, balanceAmount, balanceHistory);
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-
-        private static void processTransaction(String type, BigDecimal amount, String nameKeySort, LocalDate date, String nameKey,
-                                               Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-
-            ArrayList<BalanceHistory> balanceList = balanceHistory.getOrDefault(nameKeySort, new ArrayList<>());
-            BigDecimal currentBalance = balanceAmount.getOrDefault(nameKeySort, BigDecimal.ZERO)
-                    .setScale(2, RoundingMode.DOWN);
-            BigDecimal newBalance = BigDecimal.ZERO;
-            if (type.equals("borrow")) {
-                newBalance = nameKeySort.equals(nameKey) ? currentBalance.add(amount) : currentBalance.subtract(amount);
-            } else if (type.equals("repay")) {
-                newBalance = nameKeySort.equals(nameKey) ? currentBalance.subtract(amount) : currentBalance.add(amount);
-            }
-            balanceAmount.put(nameKeySort, newBalance.setScale(2, RoundingMode.DOWN));
-            balanceList.add(new BalanceHistory(date, newBalance.setScale(2, RoundingMode.DOWN)));
-            balanceHistory.put(nameKeySort, balanceList);
-        }
-    }
-  learner_created: false
-- name: src/splitter/BalanceHistory.java
-  visible: true
-  text: |
-    package splitter;
-
-    import java.math.BigDecimal;
-    import java.time.LocalDate;
-
-    public class BalanceHistory {
-        private LocalDate date;
-        private BigDecimal balance;
-
-
-        public BalanceHistory(LocalDate date, BigDecimal balance) {
-            this.date = date;
-            this.balance = balance;
-        }
-
-        public LocalDate getDate() {
-            return date;
-        }
-
-        public void setDate(LocalDate date) {
-            this.date = date;
-        }
-
-        public BigDecimal getBalance() {
-            return balance;
-        }
-
-        public void setBalance(BigDecimal balance) {
-            this.balance = balance;
-        }
-    }
-  learner_created: false
-- name: src/splitter/Group.java
-  visible: true
-  text: |+
-    package splitter;
-
-    import java.util.*;
-    import java.util.regex.*;
-
-
-    public class Group {
-
-        static Map<String, List<String>> groupMap = new HashMap<>();
-
-        public void parceData(List<String> input) {
-            runSafely(() -> {
-                String command = input.get(1);
-                Pattern pattern = Pattern.compile("[A-Z]+\\b");
-                Matcher matcher = pattern.matcher(input.get(2));
-                String groupName = "";
-                while (matcher.find()) {
-                    groupName = matcher.group();
-                }
-
-                Set<String> temporary = new HashSet<>();
-                Pattern namePattern = Pattern.compile("(?:(?<=\\+)|(?<![-\\w]))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = 3; i < input.size(); i++) {
-                    Matcher matcherAdd = namePattern.matcher(input.get(i));
-                    while (matcherAdd.find()) {
-                        if (matcherAdd.group().matches("[A-Z]+\\b")) {
-                            List<String> names = groupMap.get(matcherAdd.group());
-                            temporary.addAll(names);
-                        } else {
-                            temporary.add(matcherAdd.group());
-                        }
-                    }
-                }
-
-                Pattern patternName = Pattern.compile("(?:(?<=\\-))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = 3; i < input.size(); i++) {
-                    Matcher matcherRemove = patternName.matcher(input.get(i));
-                    while (matcherRemove.find()) {
-                        if (matcherRemove.group().matches("[A-Z]+\\b")) {
-                            List<String> names = groupMap.get(matcherRemove.group());
-                            names.forEach(temporary::remove);
-                        } else {
-                            temporary.remove(matcherRemove.group());
-                        }
-                    }
-                }
-                switch (command) {
-                    case "create" -> createGroup(temporary, groupName);
-                    case "add" -> changeGroup(temporary, groupName);
-                    case "remove" -> removeFromGroup(temporary, groupName);
-                    case "show" -> showGroup(groupName);
-                    default -> throw new IllegalArgumentException();
-                }
-            });
-        }
-
-        private void createGroup(Set<String> temporary, String groupName) {
-            runSafely(() -> {
-                Pattern pattern = Pattern.compile("[A-Z]+\\b");
-                if (pattern.matcher(groupName).matches()) {
-                    List<String> names = new ArrayList<>(temporary);
-                    Collections.sort(names);
-                    groupMap.putIfAbsent(groupName, names);
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            });
-        }
-
-        private void changeGroup(Set<String> temporary, String groupName) {
-            if (groupMap.containsKey(groupName)) {
-                List<String> names = groupMap.get(groupName);
-                names.addAll(temporary);
-                Collections.sort(names);
-                groupMap.put(groupName, names);
-            } else {
-                System.out.println("Group doesn't exist");
-            }
-        }
-
-        private void removeFromGroup(Set<String> temporary, String groupName) {
-            if (groupMap.containsKey(groupName)) {
-                List<String> names = groupMap.get(groupName);
-                names.removeAll(temporary);
-                Collections.sort(names);
-                groupMap.put(groupName, names);
-            } else {
-                System.out.println("Group doesn't exist");
-            }
-        }
-
-        private void showGroup(String groupName) {
-            runSafely(() -> {
-                if (!groupMap.containsKey(groupName)) {
-                    System.out.println("Unknown group");
-                } else {
-                    List<String> names = groupMap.get(groupName);
-                    if (names.isEmpty()) {
-                        System.out.println("Group is empty");
-                    } else {
-                        for (String name : names) {
-                            System.out.print(name);
-                            System.out.println();
-                        }
-                    }
-                }
-            });
-        }
-
-        private void runSafely(Runnable runnable) {
-            try {
-                runnable.run();
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-    }
-
-
-
-
-
-  learner_created: false
 - name: test/SharedBillsSplitterTestStage5.java
   visible: false
   text: |
@@ -791,7 +380,12 @@ files:
                             main.execute("repay Chuck Diana 12");
                             output = main.execute("balance close").trim();
                             lines = output.split("\n");
-                            for (int i = 0; i < lines.length; i++) {
+
+                            if (lines.length < response.length) {
+                                return CheckResult.wrong(INCORRECT_BALANCE);
+                            }
+
+                            for (int i = 0; i < response.length; i++) {
                                 if (!lines[i].equals(response[i]) && lines[i].equals(NO_REPAYMENTS)) {
                                     return CheckResult.wrong(INCORRECT_BALANCE);
                                 } else if (!lines[i].equals(response[i])) {
@@ -1318,6 +912,99 @@ files:
         }
     }
   learner_created: false
+- name: src/splitter/util/DateUtil.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Members.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/GroupParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/TransactionsRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/util/RegexPatterns.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Groups.java
+  visible: true
+  learner_created: true
+- name: src/splitter/AmountCalculator.java
+  visible: true
+  learner_created: true
+- name: build.gradle
+  visible: true
+  learner_created: true
+- name: src/splitter/service/BalanceService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/BorrowRepayService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/BalanceType.java
+  visible: true
+  learner_created: true
+- name: src/splitter/Command.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/BalanceParser.java
+  visible: true
+  learner_created: true
+- name: src/resources/application.properties
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Balance.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/ClearService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/SecretSanta.java
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/MembersRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/GroupService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/SecretSantaApplication.java
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/BalanceRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/BorrowRepayParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/parser/PurchaseCashbackParser.java
+  visible: true
+  learner_created: true
+- name: src/splitter/CommandProcessor.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/CashbackService.java
+  visible: true
+  learner_created: true
+- name: testDB.mv.db.mv.db
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/GroupsRepository.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Transactions.java
+  visible: true
+  learner_created: true
+- name: src/splitter/util/NameKey.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/PurchaseService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/service/WriteOffService.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11722#comment
 status: Unchecked
 record: -1

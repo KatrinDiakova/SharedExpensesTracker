@@ -43,20 +43,22 @@ public class CashbackService {
         boolean haveRemainder = calculator.hasRemainder(sharedAmount, quantityPerson);
         Deque<String> extraPayers = calculator.calcExtraPayers(haveRemainder, sharedAmount, quantityPerson);
 
-        Members company = new Members(payerMember); // to
-        membersRepository.save(company);
+        Optional<Members> findCompany = membersRepository.findByMemberName(payerMember);
+        Members company = findCompany.orElseGet(() -> membersRepository.save(new Members(payerMember)));
 
         temporary.forEach(name -> {
-                    //name - from
-                    Members person = membersRepository.getByMemberName(name);
-                    BigDecimal currentAmount = balanceService.getCurrentAmount(person, company);
-                    BigDecimal newAmount = currentAmount.subtract(sharedAmount);
-                    if (haveRemainder && name.equals(extraPayers.peek())) {
-                        newAmount = newAmount.subtract(minimumAmount);
-                        extraPayers.remove();
-                    }
-                    balanceRepository.save(new Balance(person, company, date, newAmount));
-                    transactionsRepository.save(new Transactions("cashback", date, person, company, newAmount));
-                });
+            //name - from
+            Optional<Members> findPerson = membersRepository.findByMemberName(name);
+            Members person = findPerson.orElseGet(() -> membersRepository.save(new Members(name)));
+
+            BigDecimal currentAmount = balanceService.getCurrentAmount(person, company);
+            BigDecimal newAmount = currentAmount.subtract(sharedAmount);
+            if (haveRemainder && name.equals(extraPayers.peek())) {
+                newAmount = newAmount.subtract(calculator.getMinimumAmount());
+                extraPayers.remove();
+            }
+            balanceRepository.save(new Balance(person, company, date, newAmount));
+            transactionsRepository.save(new Transactions("cashback", date, person, company, newAmount));
+        });
     }
 }

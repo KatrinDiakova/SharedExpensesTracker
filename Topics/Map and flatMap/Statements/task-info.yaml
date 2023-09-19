@@ -1,10 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: It is an intermediate operation.
-- text: The method cannot transform elements of a stream to the same elements.
-- text: It takes a two-argument function as a parameter.
-- text: It returns another stream of the same size.
+is_multiple_choice: false
 files:
 - name: src/Task.java
   visible: true

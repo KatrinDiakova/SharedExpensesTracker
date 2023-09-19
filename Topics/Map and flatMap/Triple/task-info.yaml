@@ -1,12 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: "left=1, middle=1, right=\"2\""
-- text: "left=5, middle=25, right=\"55\""
-- text: "left=1, middle=1, right=\"11\""
-- text: "left=3, middle=9, right=\"33\""
-- text: "left=4, middle=16, right=\"44\""
-- text: "left=4, middle=16, right=\"34\""
+is_multiple_choice: false
 files:
 - name: src/Task.java
   visible: true

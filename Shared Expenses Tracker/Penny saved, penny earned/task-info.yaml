@@ -806,7 +806,12 @@ files:
                             main.execute("repay Chuck Diana 12");
                             output = main.execute("balance close").trim();
                             lines = output.split("\n");
-                            for (int i = 0; i < lines.length; i++) {
+
+                            if (lines.length < response.length) {
+                                return CheckResult.wrong(INCORRECT_BALANCE);
+                            }
+
+                            for (int i = 0; i < response.length; i++) {
                                 if (!lines[i].equals(response[i]) && lines[i].equals(NO_REPAYMENTS)) {
                                     return CheckResult.wrong(INCORRECT_BALANCE);
                                 } else if (!lines[i].equals(response[i])) {

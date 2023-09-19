@@ -1,11 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: "Aspect-oriented, Functional, Object-oriented, programming, programming, programming"
-- text: "Aspect-oriented programming, Functional programming, Object-oriented programming"
-- text: "Aspect-oriented, Functional, Object-oriented, programming"
-- text: "Aspect-oriented, Object-oriented, programming"
-- text: "Aspect-oriented, Functional, Object-oriented"
 files:
 - name: src/Task.java
   visible: true

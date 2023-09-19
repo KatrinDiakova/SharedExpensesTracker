@@ -1,11 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: "10, 11, 12"
-- text: "11, 12, 13"
-- text: Infinitely
-- text: "11, 12"
-- text: "10, 11, 12, 13"
 files:
 - name: src/Task.java
   visible: true

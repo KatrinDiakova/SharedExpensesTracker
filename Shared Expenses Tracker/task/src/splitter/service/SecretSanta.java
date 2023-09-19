@@ -29,7 +29,8 @@ public class SecretSanta implements CommandProcessor {
         Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
         if (existingGroup.isPresent()) {
             Groups group = existingGroup.get();
-            List<Members> members = group.getMembers();
+            Set<Members> membersSet = group.getMembers();
+            List<Members> members = new ArrayList<>(membersSet);
             List<Members> shuffledMembers = shuffleMembers(members);
             for (int i = 0; i < members.size(); i++) {
                 System.out.println(members.get(i).getMemberName() + " gift to " + shuffledMembers.get(i).getMemberName());

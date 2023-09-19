@@ -9,6 +9,7 @@ import splitter.repository.GroupsRepository;
 import splitter.repository.MembersRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service class for working with groups and members.
@@ -31,61 +32,69 @@ public class GroupService {
      */
 
     @Transactional
-    public void createGroup(String groupName, List<String> members) {
-        if (!groupsRepository.existsByGroupName(groupName)) {
-            Groups group = new Groups(groupName);
-
-            for (String name : members) {
-                Members member = membersRepository.findByMemberName(name)
-                        .orElseGet(() -> {
-                            Members newMember = new Members(name);
-                            membersRepository.save(newMember);
-                            return newMember;
-                        });
-
-                member.getGroups().add(group);
-                group.getMembers().add(member);
-            }
-
-            groupsRepository.save(group);
-        } else {
-            System.out.println("Group already exist");
+    public void createGroup(String groupName, Set<String> members) {
+        Groups group = groupsRepository.getByGroupName(groupName);
+        if (group != null) {
+            deleteGroup(group);
+            groupsRepository.flush();
         }
+        Groups newGroup = groupsRepository.save(new Groups(groupName));
+        for (String name : members) {
+            Optional<Members> existsMember = membersRepository.findByMemberName(name);
+            if (existsMember.isPresent()) {
+                Members member = existsMember.get();
+                member.getGroups().add(newGroup);
+                newGroup.getMembers().add(member);
+            } else {
+                Members newMember = membersRepository.save(new Members(name));
+                newMember.getGroups().add(newGroup);
+                newGroup.getMembers().add(newMember);
+            }
+        }
+        groupsRepository.save(newGroup);
     }
-//        if (groupsRepository.findByGroupName(groupName).isEmpty()) {
-//            Groups group = groupsRepository.save(new Groups(groupName));
+
+    //@Transactional
+    public void deleteGroup(Groups group) {
+        groupsRepository.delete(group);
+    }
+
+
+
+//        if (!groupsRepository.existsByGroupName(groupName)) {
+//            Groups group = new Groups(groupName);
+//            groupsRepository.save(group);
+//
 //            for (String name : members) {
-//                Optional<Members> existsMember = membersRepository.findByMemberName(name);
-//                if (existsMember.isPresent()) {
-//                    Members member = existsMember.get();
-//                    member.getGroups().add(group);
-//                    group.getMembers().add(member);
-//                } else {
-//                    Members newMember = membersRepository.save(new Members(name));
-//                    newMember.getGroups().add(group);
-//                    group.getMembers().add(newMember);
-//                }
+//                Members member = membersRepository.findByMemberName(name)
+//                        .orElseGet(() -> {
+//                            Members newMember = new Members(name);
+//                            membersRepository.save(newMember);
+//                            return newMember;
+//                        });
+//
+//                member.getGroups().add(group);
 //            }
 //            groupsRepository.save(group);
-//        }
-//    }
-//        else {
+//        } else {
 //            System.out.println("Group already exist");
 //        }
-
+//    }
 
     /**
      * Adds members to an existing group if a group with the specified name exists.
      */
 
     @Transactional
-    public void updateGroup(String groupName, List<String> members) {
+    public void updateGroup(String groupName, Set<String> members) {
         Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
         if (existingGroup.isPresent()) {
             Groups group = existingGroup.get();
             members.forEach(name -> {
-                Members member = membersRepository.save(new Members(name));
+                Optional<Members> findMember = membersRepository.findByMemberName(name);
+                Members member = findMember.orElseGet(() -> membersRepository.save(new Members(name)));
                 group.getMembers().add(member);
+                groupsRepository.save(group);
             });
         } else {
             System.out.println("Group doesn't exist");
@@ -98,27 +107,51 @@ public class GroupService {
      */
 
     @Transactional
-    public void removeFromGroup(String groupName, List<String> members) {
+    public void removeFromGroup(String groupName, Set<String> membersSet) {
         Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
         if (existingGroup.isPresent()) {
             Groups group = existingGroup.get();
-            if (members.isEmpty()) {
-                Iterator<Members> iterator = group.getMembers().iterator();
-                while (iterator.hasNext()) {
-                    Members member = iterator.next();
-                    if (member.getGroups().contains(group) && member.getGroups().size() == 1) {
-                        iterator.remove();
-                        membersRepository.delete(member);
+            if (membersSet.isEmpty()) {
+                Set<Members> members = group.getMembers();
+                members.forEach(it -> {
+                    if (it.getGroups().contains(group) && it.getGroups().size() == 1) {
+                        it.getGroups().remove(group);
                     }
-                }
+                });
+                group.getMembers().clear();
                 groupsRepository.delete(group);
             } else {
-                members.forEach(membersRepository::deleteByMemberName);
+                Set<Members> membersToRemove = group.getMembers().stream()
+                        .filter(member -> membersSet.contains(member.getMemberName()))
+                        .collect(Collectors.toSet());
+                group.getMembers().removeAll(membersToRemove);
+                membersToRemove.forEach(member -> {
+                    member.getGroups().remove(group);
+                    membersRepository.save(member);
+                });
+                groupsRepository.save(group);
+
             }
         } else {
             System.out.println("Group doesn't exist");
         }
     }
+//                Iterator<Members> iterator = group.getMembers().iterator();
+//                while (iterator.hasNext()) {
+//                    Members member = iterator.next();
+//                    if (member.getGroups().contains(group) && member.getGroups().size() == 1) {
+//                        iterator.remove();
+//                        membersRepository.delete(member);
+//                    }
+//                }
+//                groupsRepository.delete(group);
+//            } else {
+//                membersSet.forEach(membersRepository::deleteByMemberName);
+//            }
+//        } else {
+//            System.out.println("Group doesn't exist");
+//        }
+//    }
 
     /**
      * Displays a list of members for the specified group.
@@ -129,7 +162,7 @@ public class GroupService {
         Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
         if (existingGroup.isPresent()) {
             Groups group = existingGroup.get();
-            List<Members> members = group.getMembers();
+            Set<Members> members = group.getMembers();
             List<String> memberName = new ArrayList<>();
             if (!members.isEmpty()) {
                 members.forEach(member -> memberName.add(member.getMemberName()));
@@ -141,19 +174,22 @@ public class GroupService {
         } else {
             System.out.println("Unknown group");
         }
-
     }
 
     @Transactional
-    public List<String> ungroupNames(List<String> groupList) {
-        List<String> namesFromGroup = new ArrayList<>();
+    public Set<String> ungroupNames(List<String> groupList) {
+        Set<String> namesFromGroup = new HashSet<>();
         for (String groupName : groupList) {
             Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
             if (existingGroup.isPresent()) {
                 Groups group = existingGroup.get();
-                List<Members> members = group.getMembers();
-                for (Members member : members) {
-                    namesFromGroup.add(member.getMemberName());
+                Set<Members> members = group.getMembers();
+                if (members.isEmpty()) {
+                    System.out.println("Group is empty");
+                } else {
+                    for (Members member : members) {
+                        namesFromGroup.add(member.getMemberName());
+                    }
                 }
             }
         }

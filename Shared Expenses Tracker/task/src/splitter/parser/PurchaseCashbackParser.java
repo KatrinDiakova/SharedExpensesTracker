@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import splitter.Command;
 import splitter.CommandProcessor;
+import splitter.entity.Members;
 import splitter.service.CashbackService;
 import splitter.service.GroupService;
 import splitter.service.PurchaseService;
@@ -72,11 +73,7 @@ public class PurchaseCashbackParser implements CommandProcessor {
                 .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
 
         List<String> gropList = map.getOrDefault(true, Collections.emptyList());
-        List<String> namesFromGroup = groupService.ungroupNames(gropList);
-
-        if (namesFromGroup.isEmpty() && !gropList.isEmpty()) {
-            throw new IllegalArgumentException("Group is empty");
-        }
+        Set<String> namesFromGroup = groupService.ungroupNames(gropList);
 
         List<String> names = map.getOrDefault(false, Collections.emptyList());
         List<String> finalNames = new ArrayList<>();

@@ -1,12 +1,5 @@
 type: choice
 is_multiple_choice: false
-options:
-- text: It's empty
-- text: "1, 0"
-- text: "1, 0, 4, 9"
-- text: "1, 0, 4, 9, 16, 36"
-- text: "1, 0, 1, 4, 4, 9"
-- text: "16, 36"
 files:
 - name: src/Task.java
   visible: true

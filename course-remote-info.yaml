@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/25279/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Tue, 05 Sep 2023 00:36:58 UTC"
+update_date: "Mon, 18 Sep 2023 23:45:33 UTC"
 stages:
 - id: 765
   step: 11718
@@ -16,7 +16,7 @@ stages:
   is_completed: true
 - id: 768
   step: 11721
-  is_completed: false
+  is_completed: true
 - id: 769
   step: 11722
   is_completed: false
@@ -35,16 +35,16 @@ topics:
     theory_id: 16927
   - title: Units of information
     theory_id: 6865
+  - title: "Write, compile, and run"
+    theory_id: 3739
+  - title: "JVM, JRE, and JDK"
+    theory_id: 3499
   - title: Introduction to Operating systems
     theory_id: 9704
   - title: Command line overview
     theory_id: 8977
-  - title: "Write, compile, and run"
-    theory_id: 3739
   - title: Parameters and Options
     theory_id: 9746
-  - title: "JVM, JRE, and JDK"
-    theory_id: 3499
   - title: Pseudocode
     theory_id: 15090
   - title: Pseudocode basics
@@ -57,8 +57,6 @@ topics:
     theory_id: 5357
   - title: Immutability
     theory_id: 7929
-  - title: Files
-    theory_id: 13025
   - title: Introduction to Java
     theory_id: 3500
   - title: Basic literals
@@ -111,8 +109,6 @@ topics:
     theory_id: 3489
   - title: Functional decomposition
     theory_id: 10570
-  - title: Overloading
-    theory_id: 3525
   - title: Primitive and reference types
     theory_id: 5035
   - title: Array
@@ -127,32 +123,32 @@ topics:
     theory_id: 7427
   - title: Iterating over arrays
     theory_id: 3602
-  - title: Errors in programs
-    theory_id: 3536
   - title: What is an exception
     theory_id: 3497
   - title: NPE
     theory_id: 1945
+  - title: Build tools
+    theory_id: 4284
+  - title: Gradle basics
+    theory_id: 5075
   - title: Introduction to OOP
     theory_id: 3614
   - title: Package
     theory_id: 3621
   - title: Java Archive
     theory_id: 4311
-  - title: Hierarchy of exceptions
-    theory_id: 3570
-  - title: Exception handling
-    theory_id: 3552
-  - title: Build tools
-    theory_id: 4284
-  - title: Gradle basics
-    theory_id: 5075
   - title: Basic project with Gradle
     theory_id: 5077
   - title: Building apps using Gradle
     theory_id: 7917
+  - title: Hierarchy of exceptions
+    theory_id: 3570
+  - title: Exception handling
+    theory_id: 3552
   - title: What is a bug
     theory_id: 5504
+  - title: Files
+    theory_id: 13025
   - title: Introduction to databases
     theory_id: 8497
   - title: What is SQL
@@ -217,14 +213,6 @@ topics:
     theory_id: 3599
   - title: Inheritance
     theory_id: 3583
-  - title: Protected modifier
-    theory_id: 6692
-  - title: Referencing subclass objects
-    theory_id: 3585
-  - title: The Object class
-    theory_id: 3596
-  - title: Multiple constructors
-    theory_id: 3538
   - title: The keyword super
     theory_id: 3588
   - title: Objects
@@ -256,8 +244,6 @@ topics:
   - title: Comparable
     theory_id: 14456
   1:
-  - title: Regexps basics
-    theory_id: 7580
   - title: Regexps in Java
     theory_id: 3670
   - title: "Sets, ranges, alternations"
@@ -274,14 +260,14 @@ topics:
     theory_id: 3716
   - title: BigDecimal
     theory_id: 13511
+  - title: Regexps basics
+    theory_id: 7580
   2:
   - title: The Set interface
     theory_id: 3575
   - title: Optional
     theory_id: 9699
   3:
-  - title: World Wide Web
-    theory_id: 6633
   - title: HyperText Transfer Protocol
     theory_id: 6569
   - title: Introduction to Spring Boot
@@ -328,26 +314,26 @@ topics:
     theory_id: 7545
   - title: Dependency injection
     theory_id: 20580
+  - title: Design principles
+    theory_id: 8956
   - title: YAML
     theory_id: 12722
+  - title: Coupling and cohesion
+    theory_id: 21478
   - title: Relational Data Model
     theory_id: 13785
   - title: Logic and comparison expressions
     theory_id: 8619
   - title: Interfaces
     theory_id: 9640
-  - title: JSON
-    theory_id: 6854
-  - title: XML
-    theory_id: 6901
   - title: Data and object mapping
     theory_id: 8262
   - title: Object-Relational Mapping (ORM)
     theory_id: 8312
-  - title: Intro to MySQL
-    theory_id: 16662
   - title: Results ordering
     theory_id: 8627
+  - title: Intro to MySQL
+    theory_id: 16662
   - title: The NULL value
     theory_id: 7907
   - title: Introduction to JPA
@@ -369,6 +355,8 @@ topics:
   - title: Inner classes
     theory_id: 11505
   4:
+  - title: Modulo division
+    theory_id: 10586
   - title: The concept of patterns
     theory_id: 3611
   - title: "Hashing: overview"
@@ -377,12 +365,12 @@ topics:
     theory_id: 30143
   - title: Hash table
     theory_id: 13054
-  - title: Ordering and total order
-    theory_id: 9253
   - title: Function composition
     theory_id: 3580
   - title: The Map interface
     theory_id: 3558
+  - title: Ordering and total order
+    theory_id: 9253
   - title: Comparator
     theory_id: 12966
   - title: Functional data processing with streams
@@ -416,6 +404,8 @@ topics:
     theory_id: 15969
   - title: Weighted graph
     theory_id: 5645
+  - title: Graph traversal
+    theory_id: 31965
   - title: Flow network
     theory_id: 24093
   - title: Maximum flow problem

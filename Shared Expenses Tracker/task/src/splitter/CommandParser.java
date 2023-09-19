@@ -22,8 +22,8 @@ public class CommandParser {
         }
         processors.put(Command.help, (List<String> inputs) ->
                 Stream.of(Command.values())
-                .sorted(Comparator.comparing(Enum::name))
-                .forEach(System.out::println));
+                        .sorted(Comparator.comparing(Enum::name))
+                        .forEach(System.out::println));
     }
 
     boolean parseUserInput(String input) {

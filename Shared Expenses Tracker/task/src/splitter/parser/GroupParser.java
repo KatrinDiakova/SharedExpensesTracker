@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import splitter.Command;
 import splitter.CommandProcessor;
+import splitter.entity.Members;
 import splitter.service.GroupService;
 import splitter.util.RegexPatterns;
 
@@ -36,13 +37,13 @@ public class GroupParser implements CommandProcessor {
                     .reduce((first, second) -> second)
                     .map(MatchResult::group)
                     .orElseThrow(() -> new IllegalArgumentException("Illegal command arguments"));
-            List<String> membersList = new ArrayList<>();
-            process(input, RegexPatterns.PLUS_PATTERN, membersList::addAll);
-            process(input, RegexPatterns.MINUS_PATTERN, membersList::removeAll);
+            Set<String> membersSet = new HashSet<>();
+            process(input, RegexPatterns.PLUS_PATTERN, membersSet::addAll);
+            process(input, RegexPatterns.MINUS_PATTERN, membersSet::removeAll);
             switch (command) {
-                case "create" -> groupService.createGroup(groupName, membersList);
-                case "add" -> groupService.updateGroup(groupName, membersList);
-                case "remove" -> groupService.removeFromGroup(groupName, membersList);
+                case "create" -> groupService.createGroup(groupName, membersSet);
+                case "add" -> groupService.updateGroup(groupName, membersSet);
+                case "remove" -> groupService.removeFromGroup(groupName, membersSet);
                 case "show" -> groupService.showGroup(groupName);
                 default -> throw new IllegalArgumentException();
             }
@@ -54,18 +55,14 @@ public class GroupParser implements CommandProcessor {
 
     private void process(List<String> input, Pattern PATTERN, Consumer<List<String>> action) {
         Map<Boolean, List<String>> map = input.stream()
-                .skip(3) // (+Bob, GIRLS, -Frank, Chuck)
-                // элементы потока проверяются на соответсвие патерну ( сначала PLUS_PATTERN, затем MINUS_PATTERN)
-                // для PLUS_PATTERN поток Bob, GIRLS, Chuck, для MINUS_PATTERN Frank
+                .skip(3)
                 .flatMap(it -> PATTERN.matcher(it).results())
                 .map(MatchResult::group)
                 .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
 
-        // true GIRLS
-        List<String> groupList = map.getOrDefault(true, Collections.emptyList());
 
-        // false Bob, Chuck
-        List<String> names = map.getOrDefault(false, Collections.emptyList());
+        List<String> groupList = map.getOrDefault(true, Collections.emptyList()); // it's a group name
+        List<String> names = map.getOrDefault(false, Collections.emptyList()); // it's a members name
 
         List<String> finalNames = new ArrayList<>();
         finalNames.addAll(names);

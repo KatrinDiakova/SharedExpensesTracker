@@ -1,11 +1,5 @@
 type: choice
-is_multiple_choice: true
-options:
-- text: list.stream().reduce(...).collect(...);
-- text: list.stream().map(...).collect(...);
-- text: list.stream().filter(...).map(...).filter(...).reduce(...);
-- text: list.stream().map(...).map(...).map(...).filter(...).collect(...);
-- text: list.stream(...).reduce(...).map();
+is_multiple_choice: false
 files:
 - name: src/Task.java
   visible: true

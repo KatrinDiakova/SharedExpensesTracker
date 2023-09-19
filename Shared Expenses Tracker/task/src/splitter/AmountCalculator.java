@@ -1,5 +1,7 @@
 package splitter;
 
+import splitter.entity.Members;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -38,5 +40,9 @@ public class AmountCalculator {
         return IntStream.range(0, extraPayersCount)
                 .mapToObj(temporaryList::get)
                 .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    public BigDecimal getMinimumAmount() {
+        return minimumAmount;
     }
 }
