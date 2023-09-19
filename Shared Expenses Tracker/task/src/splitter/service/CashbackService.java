@@ -18,9 +18,6 @@ import java.util.*;
 @Service
 public class CashbackService {
 
-    private final BigDecimal minimumAmount = new BigDecimal("0.01");
-    boolean haveRemainder = false;
-
     private final BalanceRepository balanceRepository;
     private final MembersRepository membersRepository;
     private final TransactionsRepository transactionsRepository;
@@ -36,7 +33,7 @@ public class CashbackService {
 
     @Transactional
     public void process(LocalDate date, String payerMember, BigDecimal totalPrice, Set<String> temporary) {
-        BigDecimal quantityPerson = new BigDecimal(temporary.size()); // 3 количество учасников транзакции
+        BigDecimal quantityPerson = new BigDecimal(temporary.size());
         AmountCalculator calculator = new AmountCalculator(totalPrice, temporary, payerMember);
 
         BigDecimal sharedAmount = calculator.calcSharedAmount(quantityPerson);
@@ -44,7 +41,7 @@ public class CashbackService {
         Deque<String> extraPayers = calculator.calcExtraPayers(haveRemainder, sharedAmount, quantityPerson);
 
         Optional<Members> findCompany = membersRepository.findByMemberName(payerMember);
-        Members company = findCompany.orElseGet(() -> membersRepository.save(new Members(payerMember)));
+        Members company = findCompany.orElseGet(() -> membersRepository.save(new Members(payerMember))); // to
 
         temporary.forEach(name -> {
             //name - from

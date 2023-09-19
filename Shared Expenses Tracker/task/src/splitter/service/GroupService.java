@@ -54,32 +54,10 @@ public class GroupService {
         groupsRepository.save(newGroup);
     }
 
-    //@Transactional
     public void deleteGroup(Groups group) {
         groupsRepository.delete(group);
     }
 
-
-
-//        if (!groupsRepository.existsByGroupName(groupName)) {
-//            Groups group = new Groups(groupName);
-//            groupsRepository.save(group);
-//
-//            for (String name : members) {
-//                Members member = membersRepository.findByMemberName(name)
-//                        .orElseGet(() -> {
-//                            Members newMember = new Members(name);
-//                            membersRepository.save(newMember);
-//                            return newMember;
-//                        });
-//
-//                member.getGroups().add(group);
-//            }
-//            groupsRepository.save(group);
-//        } else {
-//            System.out.println("Group already exist");
-//        }
-//    }
 
     /**
      * Adds members to an existing group if a group with the specified name exists.
@@ -136,22 +114,6 @@ public class GroupService {
             System.out.println("Group doesn't exist");
         }
     }
-//                Iterator<Members> iterator = group.getMembers().iterator();
-//                while (iterator.hasNext()) {
-//                    Members member = iterator.next();
-//                    if (member.getGroups().contains(group) && member.getGroups().size() == 1) {
-//                        iterator.remove();
-//                        membersRepository.delete(member);
-//                    }
-//                }
-//                groupsRepository.delete(group);
-//            } else {
-//                membersSet.forEach(membersRepository::deleteByMemberName);
-//            }
-//        } else {
-//            System.out.println("Group doesn't exist");
-//        }
-//    }
 
     /**
      * Displays a list of members for the specified group.

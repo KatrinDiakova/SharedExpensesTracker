@@ -1,5 +1,5 @@
 package splitter;
-/**
+/*
  * [date] borrow PersonOne PersonTwo amount
  * [date] repay PersonOne PersonTwo amount
  * [date] balance [open|close]

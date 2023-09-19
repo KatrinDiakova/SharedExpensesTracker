@@ -1,7 +1,5 @@
 package splitter;
 
-import splitter.entity.Members;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -23,7 +21,7 @@ public class AmountCalculator {
     }
 
     public BigDecimal calcSharedAmount(BigDecimal quantityPerson) {
-        return totalPrice.divide(quantityPerson, RoundingMode.FLOOR); // 5.21 сумма которая делится между участниками
+        return totalPrice.divide(quantityPerson, RoundingMode.FLOOR);
     }
 
     public boolean hasRemainder(BigDecimal sharedAmount, BigDecimal quantityPerson) {

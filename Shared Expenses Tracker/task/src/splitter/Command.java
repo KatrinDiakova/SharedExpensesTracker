@@ -11,7 +11,6 @@ public enum Command {
     repay,
     secretSanta,
     writeOff;
-    //clear;
 
     public static Command of(String value) {
         for (Command command : Command.values()) {

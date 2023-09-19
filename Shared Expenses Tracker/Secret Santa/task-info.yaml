@@ -829,9 +829,6 @@ files:
 - name: src/splitter/service/BorrowRepayService.java
   visible: true
   learner_created: true
-- name: src/splitter/service/ClearService.java
-  visible: true
-  learner_created: true
 - name: src/splitter/service/WriteOffService.java
   visible: true
   learner_created: true
@@ -863,5 +860,5 @@ feedback_link: https://hyperskill.org/learn/step/11721#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: "Mon, 18 Sep 2023 23:51:15 UTC"
+  time: "Tue, 19 Sep 2023 01:00:43 UTC"
 record: 4

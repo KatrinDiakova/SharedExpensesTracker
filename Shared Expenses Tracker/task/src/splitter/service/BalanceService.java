@@ -40,7 +40,7 @@ public class BalanceService {
                 if (processedMembers.contains(memberKey)) {
                     continue;
                 }
-                //В этом блоке вы фильтруете все записи balances, чтобы найти все записи, которые соответствуют текущей паре участников (fromMember и toMember).
+                //filter all balances records to find all records that match the current member pair (fromMember and toMember).
                 List<Balance> memberKeyBalance = balances.stream()
                         .filter(it -> it.getFromMember().equals(fromMember) && it.getToMember().equals(toMember)).toList();
                 final LocalDate finalDate = (balanceType == BalanceType.open) ? date.withDayOfMonth(1) : date;
