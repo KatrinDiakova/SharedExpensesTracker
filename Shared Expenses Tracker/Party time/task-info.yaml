@@ -957,9 +957,6 @@ files:
 - name: src/splitter/entity/Balance.java
   visible: true
   learner_created: true
-- name: src/splitter/service/ClearService.java
-  visible: true
-  learner_created: true
 - name: src/splitter/service/SecretSanta.java
   visible: true
   learner_created: true
@@ -987,9 +984,6 @@ files:
 - name: src/splitter/service/CashbackService.java
   visible: true
   learner_created: true
-- name: testDB.mv.db.mv.db
-  visible: true
-  learner_created: true
 - name: src/splitter/repository/GroupsRepository.java
   visible: true
   learner_created: true
@@ -1005,6 +999,12 @@ files:
 - name: src/splitter/service/WriteOffService.java
   visible: true
   learner_created: true
+- name: testDB.mv.db.mv.db
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11722#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Wed, 20 Sep 2023 01:07:47 UTC"
 record: -1

@@ -153,6 +153,8 @@ public class GroupService {
                         namesFromGroup.add(member.getMemberName());
                     }
                 }
+            } else {
+                System.out.println("Group does not exist");
             }
         }
         return namesFromGroup;

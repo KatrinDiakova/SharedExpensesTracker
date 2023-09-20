@@ -47,7 +47,7 @@ public class PurchaseCashbackParser implements CommandProcessor {
             }
             Command command = Command.of(input.get(commandIndex));
             String payerMember = input.get(commandIndex + 1);
-            BigDecimal totalPrice = new BigDecimal(input.get(commandIndex + 3));
+            BigDecimal totalPrice = new BigDecimal(input.get(commandIndex + 3)).setScale(2, RoundingMode.DOWN);
 
             Set<String> temporary = new TreeSet<>();
             process(input, commandIndex, RegexPatterns.PLUS_PATTERN, temporary::addAll);
@@ -58,6 +58,7 @@ public class PurchaseCashbackParser implements CommandProcessor {
                 case cashBack -> cashbackService.process(date, payerMember, totalPrice, temporary);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Illegal command arguments");
         }
     }

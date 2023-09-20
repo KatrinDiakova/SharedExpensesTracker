@@ -21,7 +21,7 @@ public class AmountCalculator {
     }
 
     public BigDecimal calcSharedAmount(BigDecimal quantityPerson) {
-        return totalPrice.divide(quantityPerson, RoundingMode.FLOOR);
+        return totalPrice.divide(quantityPerson,2, RoundingMode.DOWN);
     }
 
     public boolean hasRemainder(BigDecimal sharedAmount, BigDecimal quantityPerson) {
@@ -32,8 +32,10 @@ public class AmountCalculator {
         BigDecimal remainderAmount = haveRemainder ? totalPrice.subtract(sharedAmount.multiply(quantityPerson)) : BigDecimal.ZERO; //0.02
         int extraPayersCount = haveRemainder ? remainderAmount.divide(minimumAmount, RoundingMode.DOWN).intValue() : 0; // 2
 
+//        System.out.println("remainderAmount " + remainderAmount);
+//        System.out.println("extraPayersCount " + extraPayersCount);
+
         List<String> temporaryList = new ArrayList<>(temporary);
-        temporaryList.remove(payerPerson);
 
         return IntStream.range(0, extraPayersCount)
                 .mapToObj(temporaryList::get)

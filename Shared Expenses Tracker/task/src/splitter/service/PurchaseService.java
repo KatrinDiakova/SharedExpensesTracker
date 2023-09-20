@@ -40,11 +40,13 @@ public class PurchaseService {
         BigDecimal sharedAmount = calculator.calcSharedAmount(quantityPerson);
         boolean haveRemainder = calculator.hasRemainder(sharedAmount, quantityPerson);
         Deque<String> extraPayers = calculator.calcExtraPayers(haveRemainder, sharedAmount, quantityPerson);
+        extraPayers.remove(payerPerson);
 
         Optional<Members> findPayerPerson = membersRepository.findByMemberName(payerPerson);
         Members personOne = findPayerPerson.orElseGet(() -> membersRepository.save(new Members(payerPerson)));
 
         temporary.stream()
+                .sorted()
                 .filter(name -> !name.equals(payerPerson))
                 .forEach(name -> {
                     Optional<Members> findPersonTwo = membersRepository.findByMemberName(name);
@@ -59,14 +61,14 @@ public class PurchaseService {
                     BigDecimal newAmount;
                     newAmount = keyEquals ? currentAmount.subtract(sharedAmount) : currentAmount.add(sharedAmount);
 
-                    if (haveRemainder && name.equals(extraPayers.peek())) {
+                    if (haveRemainder && !extraPayers.isEmpty()) {
                         newAmount = keyEquals ? newAmount.subtract(calculator.getMinimumAmount()) : newAmount.add(calculator.getMinimumAmount());
                         extraPayers.remove();
+
                     }
                     balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));
                     transactionsRepository.save(new Transactions("purchase", date, personTwo, personOne, newAmount));
                 });
-
     }
 }
 

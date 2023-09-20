@@ -11,6 +11,7 @@ import splitter.repository.BalanceRepository;
 import java.math.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BalanceService {
@@ -25,8 +26,9 @@ public class BalanceService {
     }
 
     @Transactional
-    public void process(LocalDate date, BalanceType balanceType) {
+    public void process(LocalDate date, BalanceType balanceType, Set<String> temporary) {
         List<Balance> balances = balanceRepository.findAll();
+
         if (!balances.isEmpty()) {
             Set<String> processedMembers = new HashSet<>();
             List<String> results = new ArrayList<>();
@@ -54,10 +56,25 @@ public class BalanceService {
                 results.add((totalAmount.signum() == 0) ? "No repayments" : buildRepaymentString(name, totalAmount));
                 processedMembers.add(memberKey);
             }
-            results.stream().sorted().forEach(System.out::println);
+            filterPrintResults(results, temporary);
         } else {
             System.out.println("No repayments");
         }
+    }
+
+    private void filterPrintResults(List<String> results, Set<String> temporary) {
+        if (!temporary.isEmpty()) {
+            results = results.stream()
+                    .filter(it -> {
+                        String ownMember = it.split(" ")[0];
+                        return temporary.contains(ownMember);
+                    })
+                    .collect(Collectors.toList());
+            if (results.isEmpty()) {
+                System.out.println("No repayments");
+            }
+        }
+        results.stream().sorted().forEach(System.out::println);
     }
 
     private static String buildRepaymentString(String[] name, BigDecimal totalAmount) {
@@ -82,7 +99,6 @@ public class BalanceService {
         return balanceRepository.findCurrentAmount(mainPerson, secondPerson)
                 .stream()
                 .findFirst()
-                .orElse(BigDecimal.ZERO)
-                .setScale(2, RoundingMode.HALF_EVEN);
+                .orElse(BigDecimal.ZERO);
     }
 }
