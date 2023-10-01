@@ -7,10 +7,10 @@ import splitter.util.NameKey;
 import splitter.AmountCalculator;
 import splitter.entity.Balance;
 import splitter.entity.Members;
-import splitter.entity.Transactions;
+//import splitter.entity.Transactions;
 import splitter.repository.BalanceRepository;
 import splitter.repository.MembersRepository;
-import splitter.repository.TransactionsRepository;
+//import splitter.repository.TransactionsRepository;
 
 import java.math.*;
 import java.time.LocalDate;
@@ -21,14 +21,13 @@ public class PurchaseService {
 
     private final BalanceRepository balanceRepository;
     private final MembersRepository membersRepository;
-    private final TransactionsRepository transactionsRepository;
     private final BalanceService balanceService;
 
     @Autowired
-    public PurchaseService(BalanceRepository balance, MembersRepository members, TransactionsRepository transactions, BalanceService balanceService) {
+    public PurchaseService(BalanceRepository balance, MembersRepository members,
+                           BalanceService balanceService) {
         this.balanceRepository = balance;
         this.membersRepository = members;
-        this.transactionsRepository = transactions;
         this.balanceService = balanceService;
     }
 
@@ -67,7 +66,6 @@ public class PurchaseService {
 
                     }
                     balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));
-                    transactionsRepository.save(new Transactions("purchase", date, personTwo, personOne, newAmount));
                 });
     }
 }

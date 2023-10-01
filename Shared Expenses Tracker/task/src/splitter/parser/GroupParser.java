@@ -59,7 +59,6 @@ public class GroupParser implements CommandProcessor {
                 .map(MatchResult::group)
                 .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
 
-
         List<String> groupList = map.getOrDefault(true, Collections.emptyList()); // it's a group name
         List<String> names = map.getOrDefault(false, Collections.emptyList()); // it's a members name
 

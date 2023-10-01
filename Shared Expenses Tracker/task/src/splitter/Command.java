@@ -10,11 +10,12 @@ public enum Command {
     purchase,
     repay,
     secretSanta,
-    writeOff;
+    writeOff,
+    balancePerfect;
 
     public static Command of(String value) {
         for (Command command : Command.values()) {
-            if (value.contains(command.name())) {
+            if (value.equals(command.name())) {
                 return command;
             }
         }

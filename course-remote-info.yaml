@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/25279/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Mon, 18 Sep 2023 23:45:33 UTC"
+update_date: "Sun, 01 Oct 2023 04:34:12 UTC"
 stages:
 - id: 765
   step: 11718
@@ -19,16 +19,16 @@ stages:
   is_completed: true
 - id: 769
   step: 11722
-  is_completed: false
+  is_completed: true
 - id: 770
   step: 11723
-  is_completed: false
+  is_completed: true
 topics:
   0:
   - title: Computer algorithms
     theory_id: 16547
-  - title: The big O notation
-    theory_id: 16699
+  - title: "Big O: how to count it"
+    theory_id: 35901
   - title: "Best, average and worst cases"
     theory_id: 20084
   - title: Data structures
@@ -53,10 +53,10 @@ topics:
     theory_id: 20922
   - title: Fixed-size array
     theory_id: 20078
-  - title: Dynamic array
-    theory_id: 5357
   - title: Immutability
     theory_id: 7929
+  - title: Dynamic array
+    theory_id: 5357
   - title: Introduction to Java
     theory_id: 3500
   - title: Basic literals
@@ -115,36 +115,36 @@ topics:
     theory_id: 3511
   - title: Arrays as parameters
     theory_id: 3594
+  - title: Iterating over arrays
+    theory_id: 3602
   - title: Characters
     theory_id: 3514
   - title: String
     theory_id: 3523
   - title: Final variables
     theory_id: 7427
-  - title: Iterating over arrays
-    theory_id: 3602
   - title: What is an exception
     theory_id: 3497
   - title: NPE
     theory_id: 1945
-  - title: Build tools
-    theory_id: 4284
-  - title: Gradle basics
-    theory_id: 5075
   - title: Introduction to OOP
     theory_id: 3614
   - title: Package
     theory_id: 3621
-  - title: Java Archive
-    theory_id: 4311
-  - title: Basic project with Gradle
-    theory_id: 5077
-  - title: Building apps using Gradle
-    theory_id: 7917
   - title: Hierarchy of exceptions
     theory_id: 3570
   - title: Exception handling
     theory_id: 3552
+  - title: Build tools
+    theory_id: 4284
+  - title: Java Archive
+    theory_id: 4311
+  - title: Gradle basics
+    theory_id: 5075
+  - title: Basic project with Gradle
+    theory_id: 5077
+  - title: Building apps using Gradle
+    theory_id: 7917
   - title: What is a bug
     theory_id: 5504
   - title: Files
@@ -159,12 +159,12 @@ topics:
     theory_id: 7400
   - title: Arithmetic expressions
     theory_id: 7409
+  - title: Processing strings
+    theory_id: 3551
   - title: Basic SELECT statement
     theory_id: 7392
   - title: SELECT FROM statement
     theory_id: 8611
-  - title: Processing strings
-    theory_id: 3551
   - title: Introduction to logging
     theory_id: 5538
   - title: Debugging techniques
@@ -189,14 +189,14 @@ topics:
     theory_id: 3770
   - title: The Collections Framework overview
     theory_id: 3624
-  - title: ArrayList
-    theory_id: 3567
-  - title: The List interface
-    theory_id: 3581
   - title: Method references
     theory_id: 3620
   - title: Functional interfaces
     theory_id: 11636
+  - title: ArrayList
+    theory_id: 3567
+  - title: The List interface
+    theory_id: 3581
   - title: Standard functional interfaces
     theory_id: 3623
   - title: BigInteger
@@ -263,10 +263,10 @@ topics:
   - title: Regexps basics
     theory_id: 7580
   2:
-  - title: The Set interface
-    theory_id: 3575
   - title: Optional
     theory_id: 9699
+  - title: The Set interface
+    theory_id: 3575
   3:
   - title: HyperText Transfer Protocol
     theory_id: 6569
@@ -300,42 +300,42 @@ topics:
     theory_id: 18086
   - title: Dependency management
     theory_id: 5076
+  - title: External resources
+    theory_id: 6216
   - title: Web development
     theory_id: 13931
   - title: Libraries
     theory_id: 8504
   - title: Frameworks
     theory_id: 6701
-  - title: External resources
-    theory_id: 6216
   - title: Functional testing
     theory_id: 13438
   - title: Unit testing
     theory_id: 7545
   - title: Dependency injection
     theory_id: 20580
-  - title: Design principles
-    theory_id: 8956
-  - title: YAML
-    theory_id: 12722
-  - title: Coupling and cohesion
-    theory_id: 21478
   - title: Relational Data Model
     theory_id: 13785
-  - title: Logic and comparison expressions
-    theory_id: 8619
   - title: Interfaces
     theory_id: 9640
+  - title: YAML
+    theory_id: 12722
+  - title: Design principles
+    theory_id: 8956
+  - title: Coupling and cohesion
+    theory_id: 21478
+  - title: Logic and comparison expressions
+    theory_id: 8619
+  - title: The NULL value
+    theory_id: 7907
+  - title: Intro to MySQL
+    theory_id: 16662
   - title: Data and object mapping
     theory_id: 8262
   - title: Object-Relational Mapping (ORM)
     theory_id: 8312
   - title: Results ordering
     theory_id: 8627
-  - title: Intro to MySQL
-    theory_id: 16662
-  - title: The NULL value
-    theory_id: 7907
   - title: Introduction to JPA
     theory_id: 17125
   - title: Aggregate functions

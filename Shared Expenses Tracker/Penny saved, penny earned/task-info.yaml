@@ -73,417 +73,6 @@ files:
         }
     }
   learner_created: false
-- name: src/splitter/Balance.java
-  visible: true
-  text: |-
-    package splitter;
-    import java.math.BigDecimal;
-    import java.math.RoundingMode;
-    import java.time.LocalDate;
-    import java.util.*;
-
-    public class Balance {
-
-        private static String type = "close";
-
-        public void parceData(List<String> input, Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            Date.index = 0;
-            LocalDate date = Date.getDate(input);
-            if (input.size() > Date.index + 1) {
-                if (input.get(Date.index + 1).equals("open") || input.get(Date.index + 1).equals("close")) {
-                    type = input.get(Date.index + 1);
-                }
-            }
-            processBalance(date, balanceAmount, balanceHistory);
-        }
-
-        private static void processBalance(LocalDate inputDate, Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                List<String> repayment = new ArrayList<>();
-                for (var key : balanceAmount.keySet()) {
-                    String[] name = key.split("-");
-                    ArrayList<BalanceHistory> history = balanceHistory.get(key);
-                    history.sort(Comparator.comparing(BalanceHistory::getDate));
-
-                    if (type.equals("open")) {
-                        inputDate = inputDate.withDayOfMonth(1);
-                    }
-                    BigDecimal totalAmount = BigDecimal.ZERO;
-                    for (BalanceHistory balanceHist : history) {
-                        LocalDate balanceDate = balanceHist.getDate();
-                        if (type.equals("close") && !balanceDate.isAfter(inputDate) ||
-                                type.equals("open") && balanceDate.isBefore(inputDate)) {
-                            totalAmount = balanceHist.getBalance();
-                        }
-                    }
-                    if (totalAmount.signum() == 0) {
-                        repayment.add("No repayments");
-                    } else {
-                        if (totalAmount.signum() == -1) {
-                            repayment.add(String.format("%s owes %s %s", name[1], name[0], totalAmount.negate().setScale(2, RoundingMode.HALF_EVEN)));
-                        } else {
-                            repayment.add(String.format("%s owes %s %s", name[0], name[1], totalAmount.setScale(2, RoundingMode.HALF_EVEN)));
-                        }
-                    }
-                }
-                Collections.sort(repayment);
-                for (String result : repayment) {
-                    System.out.println(result);
-                }
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments" + e);
-            }
-        }
-    }
-  learner_created: false
-- name: src/splitter/Purchase.java
-  visible: true
-  text: |+
-    package splitter;
-
-    import java.math.*;
-    import java.time.LocalDate;
-    import java.util.*;
-    import java.util.regex.*;
-
-    import static java.util.regex.Pattern.compile;
-
-    public class Purchase {
-
-        BigDecimal minimumAmount = new BigDecimal("0.01");
-        boolean haveRemainder = false;
-        int extraPayers;
-
-        void parceData(List<String> input, Map<String, BigDecimal> balanceAmount,
-                       Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                Date.index = 0;
-                LocalDate date = Date.getDate(input);
-                String payerPerson = input.get(Date.index + 1);
-                BigDecimal totalPrice = new BigDecimal(input.get(Date.index + 3));
-
-                Set<String> temporary = new TreeSet<>();
-                Pattern namePattern = Pattern.compile("(?:(?<=\\+)|(?<![-\\w]))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = Date.index + 4; i < input.size(); i++) {
-                    Matcher matcherAdd = namePattern.matcher(input.get(i));
-                    while (matcherAdd.find()) {
-                        if (matcherAdd.group().matches("[A-Z]+\\b")) {
-                            List<String> names = Group.groupMap.get(matcherAdd.group());
-                            if (names.isEmpty()) {
-                                System.out.println("Group is empty");
-                            } else {
-                                temporary.addAll(names);
-                            }
-                        } else {
-                            temporary.add(matcherAdd.group());
-                        }
-                    }
-                }
-
-                Pattern patternName = Pattern.compile("(?:(?<=\\-))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = Date.index + 4; i < input.size(); i++) {
-                    Matcher matcherRemove = patternName.matcher(input.get(i));
-                    while (matcherRemove.find()) {
-                        if (matcherRemove.group().matches("[A-Z]+\\b")) {
-                            List<String> names = Group.groupMap.get(matcherRemove.group());
-                            names.forEach(temporary::remove);
-                        } else {
-                            temporary.remove(matcherRemove.group());
-                        }
-                    }
-                }
-                haveRemainder = false;
-                processPurchase(date, payerPerson, totalPrice, temporary, balanceAmount, balanceHistory);
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-
-        void processPurchase(LocalDate date, String payerPerson, BigDecimal totalPrice, Set<String> temporary, Map<String,
-                BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-
-            //if (Group.groupMap.containsKey(groupName)) {
-            BigDecimal remainder;
-            //List<String> names = Group.groupMap.get(groupName);
-
-            BigDecimal quantityPerson = new BigDecimal(temporary.size());
-            BigDecimal sharedAmount = totalPrice.divide(quantityPerson, RoundingMode.FLOOR);
-
-            if (!totalPrice.equals(sharedAmount.multiply(quantityPerson))) {
-                remainder = totalPrice.subtract(sharedAmount.multiply(quantityPerson));
-                extraPayers = remainder.divide(minimumAmount, RoundingMode.DOWN).intValue();
-                haveRemainder = true;
-
-            }
-            int count = 0;
-            for (String name : temporary) {
-                if (!name.equals(payerPerson)) {
-                    String[] array = {payerPerson, name};
-                    String nameKey = array[0] + "-" + array[1];
-                    Arrays.sort(array);
-                    String nameKeySort = array[0] + "-" + array[1];
-                    ArrayList<BalanceHistory> balanceList = balanceHistory.getOrDefault(nameKeySort, new ArrayList<>());
-                    BigDecimal newBalance;
-                    BigDecimal currentBalance = balanceAmount.getOrDefault(nameKeySort, BigDecimal.ZERO);
-                    newBalance = nameKeySort.equals(nameKey) ? currentBalance.subtract(sharedAmount) : currentBalance.add(sharedAmount);
-
-                    if (haveRemainder && count < extraPayers) {
-                        newBalance = nameKeySort.equals(nameKey) ? newBalance.subtract(minimumAmount) : newBalance.add(minimumAmount);
-                        count++;
-                    }
-                    balanceAmount.put(nameKeySort, newBalance);
-                    balanceList.add(new BalanceHistory(date, newBalance));
-                    balanceHistory.put(nameKeySort, balanceList);
-                }
-            }
-            //} else {
-            //System.out.println("Group doesn't exist");
-            //}
-        }
-    }
-
-
-
-  learner_created: false
-- name: src/splitter/Date.java
-  visible: true
-  text: |-
-    package splitter;
-
-    import java.time.LocalDate;
-    import java.time.format.DateTimeFormatter;
-    import java.util.List;
-
-    public class Date {
-
-        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        static int index;
-
-        static LocalDate getDate(List<String> input) {
-            LocalDate date;
-            if (input.get(0).matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
-                date = LocalDate.parse(input.get(0), formatter);
-                index = 1;
-            } else {
-                date = LocalDate.now();
-            }
-            return date;
-        }
-    }
-  learner_created: false
-- name: src/splitter/BorrowRepay.java
-  visible: true
-  text: |
-    package splitter;
-
-    import java.math.BigDecimal;
-    import java.math.RoundingMode;
-    import java.time.*;
-    import java.util.*;
-    import java.util.regex.Matcher;
-    import java.util.regex.Pattern;
-
-    public class BorrowRepay {
-
-        public void parceData(List<String> input, Map<String, BigDecimal> balanceAmount,
-                              Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-            try {
-                Date.index = 0;
-                LocalDate date = Date.getDate(input);
-                String type = input.get(Date.index);
-                String personOne = input.get(Date.index + 1);
-                String personTwo = input.get(Date.index + 2);
-                BigDecimal amount = new BigDecimal(input.get(Date.index + 3)).setScale(2, RoundingMode.DOWN);
-                String[] names = {personOne, personTwo};
-                String nameKey = names[0] + "-" + names[1];
-                Arrays.sort(names);
-                String nameKeySort = names[0] + "-" + names[1];
-
-                processTransaction(type, amount, nameKeySort, date, nameKey, balanceAmount, balanceHistory);
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-
-        private static void processTransaction(String type, BigDecimal amount, String nameKeySort, LocalDate date, String nameKey,
-                                               Map<String, BigDecimal> balanceAmount, Map<String, ArrayList<BalanceHistory>> balanceHistory) {
-
-            ArrayList<BalanceHistory> balanceList = balanceHistory.getOrDefault(nameKeySort, new ArrayList<>());
-            BigDecimal currentBalance = balanceAmount.getOrDefault(nameKeySort, BigDecimal.ZERO)
-                    .setScale(2, RoundingMode.DOWN);
-            BigDecimal newBalance = BigDecimal.ZERO;
-            if (type.equals("borrow")) {
-                newBalance = nameKeySort.equals(nameKey) ? currentBalance.add(amount) : currentBalance.subtract(amount);
-            } else if (type.equals("repay")) {
-                newBalance = nameKeySort.equals(nameKey) ? currentBalance.subtract(amount) : currentBalance.add(amount);
-            }
-            balanceAmount.put(nameKeySort, newBalance.setScale(2, RoundingMode.DOWN));
-            balanceList.add(new BalanceHistory(date, newBalance.setScale(2, RoundingMode.DOWN)));
-            balanceHistory.put(nameKeySort, balanceList);
-        }
-    }
-  learner_created: false
-- name: src/splitter/BalanceHistory.java
-  visible: true
-  text: |
-    package splitter;
-
-    import java.math.BigDecimal;
-    import java.time.LocalDate;
-
-    public class BalanceHistory {
-        private LocalDate date;
-        private BigDecimal balance;
-
-
-        public BalanceHistory(LocalDate date, BigDecimal balance) {
-            this.date = date;
-            this.balance = balance;
-        }
-
-        public LocalDate getDate() {
-            return date;
-        }
-
-        public void setDate(LocalDate date) {
-            this.date = date;
-        }
-
-        public BigDecimal getBalance() {
-            return balance;
-        }
-
-        public void setBalance(BigDecimal balance) {
-            this.balance = balance;
-        }
-    }
-  learner_created: false
-- name: src/splitter/Group.java
-  visible: true
-  text: |+
-    package splitter;
-
-    import java.util.*;
-    import java.util.regex.*;
-
-
-    public class Group {
-
-        static Map<String, List<String>> groupMap = new HashMap<>();
-
-        public void parceData(List<String> input) {
-            runSafely(() -> {
-                String command = input.get(1);
-                Pattern pattern = Pattern.compile("[A-Z]+\\b");
-                Matcher matcher = pattern.matcher(input.get(2));
-                String groupName = "";
-                while (matcher.find()) {
-                    groupName = matcher.group();
-                }
-
-                Set<String> temporary = new HashSet<>();
-                Pattern namePattern = Pattern.compile("(?:(?<=\\+)|(?<![-\\w]))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = 3; i < input.size(); i++) {
-                    Matcher matcherAdd = namePattern.matcher(input.get(i));
-                    while (matcherAdd.find()) {
-                        if (matcherAdd.group().matches("[A-Z]+\\b")) {
-                            List<String> names = groupMap.get(matcherAdd.group());
-                            temporary.addAll(names);
-                        } else {
-                            temporary.add(matcherAdd.group());
-                        }
-                    }
-                }
-
-                Pattern patternName = Pattern.compile("(?:(?<=\\-))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
-                for (int i = 3; i < input.size(); i++) {
-                    Matcher matcherRemove = patternName.matcher(input.get(i));
-                    while (matcherRemove.find()) {
-                        if (matcherRemove.group().matches("[A-Z]+\\b")) {
-                            List<String> names = groupMap.get(matcherRemove.group());
-                            names.forEach(temporary::remove);
-                        } else {
-                            temporary.remove(matcherRemove.group());
-                        }
-                    }
-                }
-                switch (command) {
-                    case "create" -> createGroup(temporary, groupName);
-                    case "add" -> changeGroup(temporary, groupName);
-                    case "remove" -> removeFromGroup(temporary, groupName);
-                    case "show" -> showGroup(groupName);
-                    default -> throw new IllegalArgumentException();
-                }
-            });
-        }
-
-        private void createGroup(Set<String> temporary, String groupName) {
-            runSafely(() -> {
-                Pattern pattern = Pattern.compile("[A-Z]+\\b");
-                if (pattern.matcher(groupName).matches()) {
-                    List<String> names = new ArrayList<>(temporary);
-                    Collections.sort(names);
-                    groupMap.putIfAbsent(groupName, names);
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            });
-        }
-
-        private void changeGroup(Set<String> temporary, String groupName) {
-            if (groupMap.containsKey(groupName)) {
-                List<String> names = groupMap.get(groupName);
-                names.addAll(temporary);
-                Collections.sort(names);
-                groupMap.put(groupName, names);
-            } else {
-                System.out.println("Group doesn't exist");
-            }
-        }
-
-        private void removeFromGroup(Set<String> temporary, String groupName) {
-            if (groupMap.containsKey(groupName)) {
-                List<String> names = groupMap.get(groupName);
-                names.removeAll(temporary);
-                Collections.sort(names);
-                groupMap.put(groupName, names);
-            } else {
-                System.out.println("Group doesn't exist");
-            }
-        }
-
-        private void showGroup(String groupName) {
-            runSafely(() -> {
-                if (!groupMap.containsKey(groupName)) {
-                    System.out.println("Unknown group");
-                } else {
-                    List<String> names = groupMap.get(groupName);
-                    if (names.isEmpty()) {
-                        System.out.println("Group is empty");
-                    } else {
-                        for (String name : names) {
-                            System.out.print(name);
-                            System.out.println();
-                        }
-                    }
-                }
-            });
-        }
-
-        private void runSafely(Runnable runnable) {
-            try {
-                runnable.run();
-            } catch (Exception e) {
-                System.out.println("Illegal command arguments");
-            }
-        }
-    }
-
-
-
-
-
-  learner_created: false
 - name: test/SharedBillsSplitterTestStage6.java
   visible: false
   text: |-
@@ -1418,6 +1007,1421 @@ files:
         }
     }
   learner_created: false
+- name: src/splitter/util/DateUtil.java
+  visible: true
+  text: |
+    package splitter.util;
+
+    import java.time.LocalDate;
+    import java.time.format.DateTimeFormatter;
+    import java.util.Optional;
+    import java.util.regex.Pattern;
+
+    public class DateUtil {
+
+        private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2}");
+
+        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+        public static LocalDate getDate(String input) {
+            return Optional.of(input)
+                    .filter(DATE_PATTERN.asPredicate())
+                    .map(it -> LocalDate.parse(it, FORMATTER))
+                    .orElse(LocalDate.now());
+        }
+
+        public static boolean isDate(String date) {
+            return DATE_PATTERN.matcher(date).matches();
+        }
+    }
+  learner_created: true
+- name: src/splitter/entity/Members.java
+  visible: true
+  text: |
+    package splitter.entity;
+
+    import javax.persistence.*;
+    import java.util.HashSet;
+    import java.util.Set;
+
+    @Entity
+    @Table(name = "Members")
+    public class Members {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "member_id")
+        private Long memberId;
+
+        @Column(name = "member_name", unique = true)
+        private String memberName;
+
+        @ManyToMany(mappedBy = "members")
+        private Set<Groups> groups = new HashSet<>();
+
+        public Members() {}
+
+        public Members(String memberName) {
+            this.memberName = memberName;
+        }
+
+        public Set<Groups> getGroups() { // получишь набор групп, в которых состоит member
+            return groups;
+        }
+
+        public String getMemberName() {
+            return memberName;
+        }
+
+        public void setMemberName(String name) {
+        }
+    }
+  learner_created: true
+- name: src/splitter/parser/GroupParser.java
+  visible: true
+  text: |+
+    package splitter.parser;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Component;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.entity.Members;
+    import splitter.service.GroupService;
+    import splitter.util.RegexPatterns;
+
+    import java.util.*;
+    import java.util.function.Consumer;
+    import java.util.regex.*;
+    import java.util.stream.*;
+
+    @Component
+    public class GroupParser implements CommandProcessor {
+
+        private final GroupService groupService;
+
+        @Autowired
+        public GroupParser(GroupService groupService) {
+            this.groupService = groupService;
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return Collections.singletonList(Command.group);
+        }
+
+        @Override
+        public void process(List<String> input) {
+            try {
+                String command = input.get(1);
+                String groupName = RegexPatterns.GROUP_PATTERN.matcher(input.get(2))
+                        .results()
+                        .reduce((first, second) -> second)
+                        .map(MatchResult::group)
+                        .orElseThrow(() -> new IllegalArgumentException("Illegal command arguments"));
+                Set<String> membersSet = new HashSet<>();
+                process(input, RegexPatterns.PLUS_PATTERN, membersSet::addAll);
+                process(input, RegexPatterns.MINUS_PATTERN, membersSet::removeAll);
+                switch (command) {
+                    case "create" -> groupService.createGroup(groupName, membersSet);
+                    case "add" -> groupService.updateGroup(groupName, membersSet);
+                    case "remove" -> groupService.removeFromGroup(groupName, membersSet);
+                    case "show" -> groupService.showGroup(groupName);
+                    default -> throw new IllegalArgumentException();
+                }
+            } catch (Exception e) {
+                System.out.println("Illegal command arguments");
+            }
+        }
+
+        private void process(List<String> input, Pattern PATTERN, Consumer<List<String>> action) {
+            Map<Boolean, List<String>> map = input.stream()
+                    .skip(3)
+                    .flatMap(it -> PATTERN.matcher(it).results())
+                    .map(MatchResult::group)
+                    .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
+
+
+            List<String> groupList = map.getOrDefault(true, Collections.emptyList()); // it's a group name
+            List<String> names = map.getOrDefault(false, Collections.emptyList()); // it's a members name
+
+            List<String> finalNames = new ArrayList<>();
+            finalNames.addAll(names);
+            finalNames.addAll(groupService.ungroupNames(groupList));
+
+            action.accept(finalNames);
+        }
+    }
+
+  learner_created: true
+- name: src/splitter/util/RegexPatterns.java
+  visible: true
+  text: |
+    package splitter.util;
+
+    import java.util.regex.Pattern;
+
+    public class RegexPatterns {
+
+        public static final Pattern PLUS_PATTERN = Pattern.compile("(?:(?<=\\+)|(?<![-\\w]))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
+        public static final Pattern MINUS_PATTERN = Pattern.compile("(?:(?<=\\-))[A-Z]+(?!\\w)", Pattern.CASE_INSENSITIVE);
+        public static final Pattern GROUP_PATTERN = Pattern.compile("[A-Z]+\\b");
+    }
+  learner_created: true
+- name: src/splitter/entity/Groups.java
+  visible: true
+  text: |+
+    package splitter.entity;
+
+    import javax.persistence.*;
+    import java.util.*;
+
+    @Entity
+    public class Groups {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "group_id")
+        private Long groupId;
+
+        @Column(name = "group_name", unique = true)
+        private String groupName;
+
+        @ManyToMany
+        @JoinTable(
+                name = "group_members",
+                joinColumns = @JoinColumn(name = "group_id"),
+                inverseJoinColumns = @JoinColumn(name = "member_id"))
+        private final Set<Members> members = new HashSet<>();
+
+        public Groups() {}
+
+        public Groups(String groupName) {
+            this.groupName = groupName;
+        }
+
+        public Set<Members> getMembers() {
+            return members;
+        }
+
+        public Long getGroupId() {
+            return groupId;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setMembers(Set<Members> members) {
+            if (members != null) {
+                this.members.clear();
+                this.members.addAll(members);
+            }
+        }
+
+        public void setGroupId(Long groupId) {
+            this.groupId = groupId;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
+        }
+    }
+
+  learner_created: true
+- name: src/splitter/AmountCalculator.java
+  visible: true
+  text: |
+    package splitter;
+
+    import java.math.BigDecimal;
+    import java.math.RoundingMode;
+    import java.util.*;
+    import java.util.stream.Collectors;
+    import java.util.stream.IntStream;
+
+    public class AmountCalculator {
+
+        private final BigDecimal minimumAmount;
+        private final BigDecimal totalPrice;
+        private final Set<String> temporary;
+        private final String payerPerson;
+
+        public AmountCalculator(BigDecimal totalPrice, Set<String> temporary, String payerPerson) {
+            this.minimumAmount = new BigDecimal("0.01");
+            this.totalPrice = totalPrice;
+            this.temporary = new LinkedHashSet<>(temporary);
+            this.payerPerson = payerPerson;
+        }
+
+        public BigDecimal calcSharedAmount(BigDecimal quantityPerson) {
+            return totalPrice.divide(quantityPerson,2, RoundingMode.DOWN);
+        }
+
+        public boolean hasRemainder(BigDecimal sharedAmount, BigDecimal quantityPerson) {
+            return !totalPrice.equals(sharedAmount.multiply(quantityPerson)); //true
+        }
+
+        public Deque<String> calcExtraPayers(boolean haveRemainder, BigDecimal sharedAmount, BigDecimal quantityPerson) {
+            BigDecimal remainderAmount = haveRemainder ? totalPrice.subtract(sharedAmount.multiply(quantityPerson)) : BigDecimal.ZERO; //0.02
+            int extraPayersCount = haveRemainder ? remainderAmount.divide(minimumAmount, RoundingMode.DOWN).intValue() : 0; // 2
+
+    //        System.out.println("remainderAmount " + remainderAmount);
+    //        System.out.println("extraPayersCount " + extraPayersCount);
+
+            List<String> temporaryList = new ArrayList<>(temporary);
+
+            return IntStream.range(0, extraPayersCount)
+                    .mapToObj(temporaryList::get)
+                    .collect(Collectors.toCollection(LinkedList::new));
+        }
+
+        public BigDecimal getMinimumAmount() {
+            return minimumAmount;
+        }
+    }
+  learner_created: true
+- name: build.gradle
+  visible: true
+  text: |-
+    buildscript {
+        apply plugin: 'hyperskill'
+
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath "org.springframework.boot:spring-boot-gradle-plugin:$hs.spring.bootVersion"
+            classpath "io.spring.gradle:dependency-management-plugin:$hs.spring.dependencyManagementVersion"
+        }
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
+
+    sourceSets.main.resources.srcDirs = ["src/resources"]
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+
+        runtimeOnly 'com.h2database:h2'
+    }
+  learner_created: true
+- name: src/splitter/service/BalanceService.java
+  visible: true
+  text: |
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.BalanceType;
+    import splitter.entity.Balance;
+    import splitter.entity.Members;
+    import splitter.repository.BalanceRepository;
+
+    import java.math.*;
+    import java.time.LocalDate;
+    import java.util.*;
+    import java.util.stream.Collectors;
+
+    @Service
+    public class BalanceService {
+
+        private static final String KEY_DELIMITER = "-";
+
+        private final BalanceRepository balanceRepository;
+
+        @Autowired
+        public BalanceService(BalanceRepository balanceRepository) {
+            this.balanceRepository = balanceRepository;
+        }
+
+        @Transactional
+        public void process(LocalDate date, BalanceType balanceType, Set<String> temporary) {
+            List<Balance> balances = balanceRepository.findAll();
+
+            if (!balances.isEmpty()) {
+                Set<String> processedMembers = new HashSet<>();
+                List<String> results = new ArrayList<>();
+
+                for (Balance balance : balances) {
+                    var fromMember = balance.getFromMember();
+                    var toMember = balance.getToMember();
+
+                    String[] name = new String[]{fromMember.getMemberName(), toMember.getMemberName()};
+                    String memberKey = fromMember.getMemberName() + KEY_DELIMITER + toMember.getMemberName();
+                    if (processedMembers.contains(memberKey)) {
+                        continue;
+                    }
+                    //filter all balances records to find all records that match the current member pair (fromMember and toMember).
+                    List<Balance> memberKeyBalance = balances.stream()
+                            .filter(it -> it.getFromMember().equals(fromMember) && it.getToMember().equals(toMember)).toList();
+                    final LocalDate finalDate = (balanceType == BalanceType.open) ? date.withDayOfMonth(1) : date;
+
+                    BigDecimal totalAmount = memberKeyBalance.stream()
+                            .filter(it -> checkIsBalanceFromHistory(finalDate, it.getDate(), balanceType))
+                            .sorted(Comparator.comparing(Balance::getDate))
+                            .reduce((first, second) -> second)
+                            .map(Balance::getAmount)
+                            .orElse(BigDecimal.ZERO);
+                    results.add((totalAmount.signum() == 0) ? "No repayments" : buildRepaymentString(name, totalAmount));
+                    processedMembers.add(memberKey);
+                }
+                filterPrintResults(results, temporary);
+            } else {
+                System.out.println("No repayments");
+            }
+        }
+
+        private void filterPrintResults(List<String> results, Set<String> temporary) {
+            if (!temporary.isEmpty()) {
+                results = results.stream()
+                        .filter(it -> {
+                            String ownMember = it.split(" ")[0];
+                            return temporary.contains(ownMember);
+                        })
+                        .collect(Collectors.toList());
+                if (results.isEmpty()) {
+                    System.out.println("No repayments");
+                }
+            }
+            results.stream().sorted().forEach(System.out::println);
+        }
+
+        private static String buildRepaymentString(String[] name, BigDecimal totalAmount) {
+            BigDecimal resultTotalAmount = totalAmount.setScale(2, RoundingMode.HALF_EVEN);
+            boolean negate = totalAmount.signum() == -1;
+            if (negate) {
+                resultTotalAmount = resultTotalAmount.negate();
+            }
+
+            var first = negate ? name[1] : name[0];
+            var second = negate ? name[0] : name[1];
+
+            return String.format("%s owes %s %s", first, second, resultTotalAmount);
+        }
+
+        private boolean checkIsBalanceFromHistory(LocalDate date, LocalDate balanceDate, BalanceType balanceType) {
+            return balanceType == BalanceType.close && !balanceDate.isAfter(date)
+                    || balanceType == BalanceType.open && balanceDate.isBefore(date);
+        }
+
+        public BigDecimal getCurrentAmount(Members mainPerson, Members secondPerson) {
+            return balanceRepository.findCurrentAmount(mainPerson, secondPerson)
+                    .stream()
+                    .findFirst()
+                    .orElse(BigDecimal.ZERO);
+        }
+    }
+  learner_created: true
+- name: src/splitter/service/BorrowRepayService.java
+  visible: true
+  text: |
+    package splitter.service;
+
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.util.NameKey;
+    import splitter.Command;
+    import splitter.entity.Balance;
+    import splitter.entity.Members;
+    import splitter.entity.Transactions;
+    import splitter.repository.*;
+
+    import java.math.*;
+    import java.time.LocalDate;
+    import java.util.List;
+    import java.util.Optional;
+
+    @Service
+    public class BorrowRepayService {
+
+        private final MembersRepository membersRepository;
+        private final BalanceRepository balanceRepository;
+        private final TransactionsRepository transactionsRepository;
+        private final BalanceService balanceService;
+
+        public BorrowRepayService(MembersRepository membersRepository, BalanceRepository balanceRepository, TransactionsRepository transactionsRepository, BalanceService balanceService) {
+            this.membersRepository = membersRepository;
+            this.balanceRepository = balanceRepository;
+            this.transactionsRepository = transactionsRepository;
+            this.balanceService = balanceService;
+        }
+
+        @Transactional
+        public void process(LocalDate date, Command command, BigDecimal amount, String person1, String person2) {
+            Optional<Members> memberFirst = membersRepository.findByMemberName(person1);
+            Optional<Members> memberSecond = membersRepository.findByMemberName(person2);
+
+            Members personOne = memberFirst.orElseGet(() -> membersRepository.save(new Members(person1)));
+            Members personTwo = memberSecond.orElseGet(() -> membersRepository.save(new Members(person2)));
+
+            boolean keyEquals = NameKey.isKeyEquals(person1, person2);
+            var mainPerson = keyEquals ? personOne : personTwo;
+            var secondPerson = keyEquals ? personTwo : personOne;
+
+            BigDecimal currentAmount = balanceService.getCurrentAmount(mainPerson, secondPerson);
+            BigDecimal newAmount = calculateNewAmount(command, amount, currentAmount, keyEquals);
+
+            balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));
+            transactionsRepository.save(new Transactions(command.name(), date, personOne, personTwo, amount));
+        }
+
+        private BigDecimal calculateNewAmount(Command command, BigDecimal amount, BigDecimal currentAmount, boolean keyEquals) {
+            return switch (command) {
+                case borrow -> keyEquals ? currentAmount.add(amount) : currentAmount.subtract(amount);
+                case repay -> keyEquals ? currentAmount.subtract(amount) : currentAmount.add(amount);
+                default -> null;
+            };
+        }
+    }
+  learner_created: true
+- name: src/splitter/BalanceType.java
+  visible: true
+  text: |
+    package splitter;
+
+    public enum BalanceType {
+        open,
+        close
+    }
+  learner_created: true
+- name: src/splitter/Command.java
+  visible: true
+  text: |
+    package splitter;
+
+    public enum Command {
+        balance,
+        borrow,
+        cashBack,
+        exit,
+        group,
+        help,
+        purchase,
+        repay,
+        secretSanta,
+        writeOff;
+
+        public static Command of(String value) {
+            for (Command command : Command.values()) {
+                if (value.contains(command.name())) {
+                    return command;
+                }
+            }
+            return null;
+        }
+    }
+  learner_created: true
+- name: src/splitter/parser/BalanceParser.java
+  visible: true
+  text: |
+    package splitter.parser;
+
+    import org.springframework.stereotype.Component;
+    import splitter.BalanceType;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.service.BalanceService;
+    import splitter.service.GroupService;
+    import splitter.util.DateUtil;
+    import splitter.util.RegexPatterns;
+
+    import java.time.LocalDate;
+    import java.util.*;
+    import java.util.function.Consumer;
+    import java.util.regex.MatchResult;
+    import java.util.regex.Pattern;
+    import java.util.stream.Collectors;
+
+    @Component
+    public class BalanceParser implements CommandProcessor {
+
+        private BalanceType balanceType = BalanceType.close;
+        private final BalanceService balanceService;
+        private final GroupService groupService;
+
+        public BalanceParser(BalanceService balanceService, GroupService groupService) {
+            this.balanceService = balanceService;
+            this.groupService = groupService;
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return Collections.singletonList(Command.balance);
+        }
+
+        @Override
+        public void process(List<String> input) {
+            try {
+                LocalDate date = LocalDate.now();
+                int commandIndex = 0;
+
+                if (DateUtil.isDate(input.get(0))) {
+                    date = DateUtil.getDate(input.get(0));
+                    commandIndex = 1;
+                }
+
+                if (input.size() > commandIndex + 1) {
+                    Optional.ofNullable(input.get(commandIndex + 1))
+                            .filter(it -> Arrays.stream(BalanceType.values())
+                                    .anyMatch(balanceType -> balanceType.name().equals(it)))
+                            .map(BalanceType::valueOf)
+                            .ifPresent(it -> balanceType = it);
+                }
+                Set<String> temporary = new TreeSet<>();
+                process(input, commandIndex, RegexPatterns.PLUS_PATTERN, temporary::addAll);
+                process(input, commandIndex, RegexPatterns.MINUS_PATTERN, temporary::removeAll);
+
+                balanceService.process(date, balanceType, temporary);
+            } catch (Exception e) {
+                System.out.println("Illegal command arguments");
+            }
+        }
+        private void process(List<String> input, int index, Pattern PATTERN, Consumer<List<String>> action) {
+            Map<Boolean, List<String>> map = input.stream()
+                    .skip(index + 2)
+                    .flatMap(it -> PATTERN.matcher(it).results())
+                    .map(MatchResult::group)
+                    .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
+
+            List<String> gropList = map.getOrDefault(true, Collections.emptyList());
+            Set<String> namesFromGroup = groupService.ungroupNames(gropList);
+
+            List<String> names = map.getOrDefault(false, Collections.emptyList());
+            List<String> finalNames = new ArrayList<>();
+            finalNames.addAll(names);
+            finalNames.addAll(namesFromGroup);
+            action.accept(finalNames);
+        }
+    }
+  learner_created: true
+- name: src/resources/application.properties
+  visible: true
+  text: |+
+    spring.main.banner-mode=off
+    spring.main.web-application-type=NONE
+    logging.level.root=error
+
+    #spring.jpa.properties.hibernate.hbm2ddl.auto=create
+
+    # URL database connections
+    spring.datasource.url=jdbc:h2:file:./testDB.mv.db
+
+    # Driver JDBC
+    spring.datasource.driver-class-name=org.h2.Driver
+
+    # User and password
+    spring.datasource.username=admin
+    spring.datasource.password=12345
+
+    # To automatically update the database schema
+    spring.jpa.hibernate.ddl-auto=update
+
+    # Enabling H2 console for database management via browser
+    spring.h2.console.enabled=true
+
+    #spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+    #spring.h2.console.settings.trace=true
+
+  learner_created: true
+- name: src/splitter/service/SecretSanta.java
+  visible: true
+  text: |
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.entity.Groups;
+    import splitter.entity.Members;
+    import splitter.repository.GroupsRepository;
+
+    import java.util.*;
+
+    @Service
+    public class SecretSanta implements CommandProcessor {
+
+        private final GroupsRepository groupsRepository;
+
+        @Autowired
+        public SecretSanta(GroupsRepository groupsRepository) {
+            this.groupsRepository = groupsRepository;
+        }
+
+
+        @Override
+        @Transactional
+        public void process(List<String> input) {
+            String groupName = input.get(1);
+            Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
+            if (existingGroup.isPresent()) {
+                Groups group = existingGroup.get();
+                Set<Members> membersSet = group.getMembers();
+                List<Members> members = new ArrayList<>(membersSet);
+                List<Members> shuffledMembers = shuffleMembers(members);
+                for (int i = 0; i < members.size(); i++) {
+                    System.out.println(members.get(i).getMemberName() + " gift to " + shuffledMembers.get(i).getMemberName());
+                }
+            }
+        }
+
+        private List<Members> shuffleMembers(List<Members> members) {
+            List<Members> shuffleMembers = new ArrayList<>(members);
+            Random random = new Random(System.currentTimeMillis());
+            do {
+                Collections.shuffle(shuffleMembers, random);
+            } while (!isShuffleValid(members, shuffleMembers));
+
+            return shuffleMembers;
+        }
+
+        private boolean isShuffleValid(List<Members> members, List<Members> shuffled) {
+            Map<Members, Members> giftPairs = new HashMap<>();
+            for (int i = 0; i < members.size(); i++) {
+                if (members.get(i).equals(shuffled.get(i))) {
+                    return false;
+                }
+                giftPairs.put(members.get(i), shuffled.get(i));
+            }
+            if (members.size() > 2) {
+                for (Map.Entry<Members, Members> entry : giftPairs.entrySet()) {
+                    Members giver = entry.getKey();
+                    Members receiver = entry.getValue();
+
+                    if (giftPairs.get(receiver) != null && giftPairs.get(receiver).equals(giver)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return Collections.singletonList(Command.secretSanta);
+        }
+    }
+  learner_created: true
+- name: src/splitter/repository/MembersRepository.java
+  visible: true
+  text: |
+    package splitter.repository;
+
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import splitter.entity.Members;
+
+    import java.util.Optional;
+
+    public interface MembersRepository extends JpaRepository<Members, Long> {
+        Optional<Members> findByMemberName(String name);
+    }
+  learner_created: true
+- name: src/splitter/service/GroupService.java
+  visible: true
+  text: |
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.entity.Groups;
+    import splitter.entity.Members;
+    import splitter.repository.GroupsRepository;
+    import splitter.repository.MembersRepository;
+
+    import java.util.*;
+    import java.util.stream.Collectors;
+
+    /**
+     * Service class for working with groups and members.
+     */
+
+    @Service
+    public class GroupService {
+
+        private final GroupsRepository groupsRepository;
+        private final MembersRepository membersRepository;
+
+        @Autowired
+        public GroupService(GroupsRepository groupsRepository, MembersRepository membersRepository) {
+            this.groupsRepository = groupsRepository;
+            this.membersRepository = membersRepository;
+        }
+
+        /**
+         * Creates a new group and adds members to it if a group with the same name does not exist.
+         */
+
+        @Transactional
+        public void createGroup(String groupName, Set<String> members) {
+            Groups group = groupsRepository.getByGroupName(groupName);
+            if (group != null) {
+                deleteGroup(group);
+                groupsRepository.flush();
+            }
+            Groups newGroup = groupsRepository.save(new Groups(groupName));
+            for (String name : members) {
+                Optional<Members> existsMember = membersRepository.findByMemberName(name);
+                if (existsMember.isPresent()) {
+                    Members member = existsMember.get();
+                    member.getGroups().add(newGroup);
+                    newGroup.getMembers().add(member);
+                } else {
+                    Members newMember = membersRepository.save(new Members(name));
+                    newMember.getGroups().add(newGroup);
+                    newGroup.getMembers().add(newMember);
+                }
+            }
+            groupsRepository.save(newGroup);
+        }
+
+        public void deleteGroup(Groups group) {
+            groupsRepository.delete(group);
+        }
+
+
+        /**
+         * Adds members to an existing group if a group with the specified name exists.
+         */
+
+        @Transactional
+        public void updateGroup(String groupName, Set<String> members) {
+            Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
+            if (existingGroup.isPresent()) {
+                Groups group = existingGroup.get();
+                members.forEach(name -> {
+                    Optional<Members> findMember = membersRepository.findByMemberName(name);
+                    Members member = findMember.orElseGet(() -> membersRepository.save(new Members(name)));
+                    group.getMembers().add(member);
+                    groupsRepository.save(group);
+                });
+            } else {
+                System.out.println("Group doesn't exist");
+            }
+        }
+
+
+        /**
+         * Removes a group and/or members from the group if they no longer belong to any group.
+         */
+
+        @Transactional
+        public void removeFromGroup(String groupName, Set<String> membersSet) {
+            Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
+            if (existingGroup.isPresent()) {
+                Groups group = existingGroup.get();
+                if (membersSet.isEmpty()) {
+                    Set<Members> members = group.getMembers();
+                    members.forEach(it -> {
+                        if (it.getGroups().contains(group) && it.getGroups().size() == 1) {
+                            it.getGroups().remove(group);
+                        }
+                    });
+                    group.getMembers().clear();
+                    groupsRepository.delete(group);
+                } else {
+                    Set<Members> membersToRemove = group.getMembers().stream()
+                            .filter(member -> membersSet.contains(member.getMemberName()))
+                            .collect(Collectors.toSet());
+                    group.getMembers().removeAll(membersToRemove);
+                    membersToRemove.forEach(member -> {
+                        member.getGroups().remove(group);
+                        membersRepository.save(member);
+                    });
+                    groupsRepository.save(group);
+
+                }
+            } else {
+                System.out.println("Group doesn't exist");
+            }
+        }
+
+        /**
+         * Displays a list of members for the specified group.
+         */
+
+        @Transactional
+        public void showGroup(String groupName) {
+            Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
+            if (existingGroup.isPresent()) {
+                Groups group = existingGroup.get();
+                Set<Members> members = group.getMembers();
+                List<String> memberName = new ArrayList<>();
+                if (!members.isEmpty()) {
+                    members.forEach(member -> memberName.add(member.getMemberName()));
+                    Collections.sort(memberName);
+                    memberName.forEach(System.out::println);
+                } else {
+                    System.out.println("Group is empty");
+                }
+            } else {
+                System.out.println("Unknown group");
+            }
+        }
+
+        @Transactional
+        public Set<String> ungroupNames(List<String> groupList) {
+            Set<String> namesFromGroup = new HashSet<>();
+            for (String groupName : groupList) {
+                Optional<Groups> existingGroup = groupsRepository.findByGroupName(groupName);
+                if (existingGroup.isPresent()) {
+                    Groups group = existingGroup.get();
+                    Set<Members> members = group.getMembers();
+                    if (members.isEmpty()) {
+                        System.out.println("Group is empty");
+                    } else {
+                        for (Members member : members) {
+                            namesFromGroup.add(member.getMemberName());
+                        }
+                    }
+                } else {
+                    System.out.println("Group does not exist");
+                }
+            }
+            return namesFromGroup;
+        }
+    }
+  learner_created: true
+- name: src/splitter/SecretSantaApplication.java
+  visible: true
+  text: |
+    package splitter;
+
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+    @SpringBootApplication
+    public class SecretSantaApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(SecretSantaApplication.class, args);
+        }
+    }
+    //    group create BOBTEAM (Frank, Bob)
+    //    group create AGROUP (Bob, -Bob)
+    //    purchase Ann coffee 12.00 (Chuck, Ann, Bob)
+    //    balance close (Bob, Ann)
+  learner_created: true
+- name: src/splitter/repository/BalanceRepository.java
+  visible: true
+  text: |
+    package splitter.repository;
+
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.data.jpa.repository.Query;
+    import org.springframework.data.repository.query.Param;
+    import splitter.entity.Balance;
+    import splitter.entity.Members;
+
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+    import java.util.List;
+
+    public interface BalanceRepository extends JpaRepository<Balance, Long> {
+
+        void deleteByDateLessThanEqual(LocalDate date);
+
+        @Query("SELECT b.amount FROM Balance b WHERE b.fromMember = :personOne AND b.toMember = :personTwo ORDER BY b.date DESC, b.balanceId DESC")
+        List<BigDecimal> findCurrentAmount(@Param("personOne") Members personOne, @Param("personTwo") Members personTwo);
+    }
+  learner_created: true
+- name: src/splitter/parser/BorrowRepayParser.java
+  visible: true
+  text: |
+    package splitter.parser;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Component;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.service.BorrowRepayService;
+    import splitter.util.DateUtil;
+
+    import java.math.*;
+    import java.time.LocalDate;
+    import java.util.*;
+
+    @Component
+    public class BorrowRepayParser implements CommandProcessor {
+
+        private final BorrowRepayService borrowRepayService;
+
+        @Autowired
+        public BorrowRepayParser(BorrowRepayService borrowRepayService) {
+            this.borrowRepayService = borrowRepayService;
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return List.of(Command.borrow, Command.repay);
+        }
+
+        @Override
+        public void process(List<String> input) {
+            try {
+                LocalDate date = LocalDate.now();
+                int commandIndex = 0;
+
+                if (DateUtil.isDate(input.get(0))) {
+                    date = DateUtil.getDate(input.get(0));
+                    commandIndex = 1;
+                }
+
+                Command command = Command.of(input.get(commandIndex));
+
+                if (Command.borrow == command || Command.repay == command) {
+                    String personOne = extractPersonOne(input, commandIndex);
+                    String personTwo = extractPersonTwo(input, commandIndex);
+                    BigDecimal amount = new BigDecimal(extractAmount(input, commandIndex)).setScale(2, RoundingMode.HALF_EVEN);
+                    borrowRepayService.process(date, command, amount, personOne, personTwo);
+                }
+            } catch (Exception e) {
+                System.out.println("Illegal command arguments");
+
+            }
+        }
+
+        private String extractPersonOne(List<String> input, int commandIndex) {
+            return input.get(commandIndex + 1);
+        }
+
+        private String extractPersonTwo(List<String> input, int commandIndex) {
+            return input.get(commandIndex + 2);
+        }
+
+        private String extractAmount(List<String> input, int commandIndex) {
+            return input.get(commandIndex + 3);
+        }
+
+    }
+  learner_created: true
+- name: src/splitter/parser/PurchaseCashbackParser.java
+  visible: true
+  text: |+
+    package splitter.parser;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Component;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.service.CashbackService;
+    import splitter.service.GroupService;
+    import splitter.service.PurchaseService;
+    import splitter.util.*;
+    import java.math.*;
+    import java.time.LocalDate;
+
+    import java.util.*;
+    import java.util.function.Consumer;
+    import java.util.regex.*;
+    import java.util.stream.*;
+
+    @Component
+    public class PurchaseCashbackParser implements CommandProcessor {
+
+        private final GroupService groupService;
+        private final PurchaseService purchaseService;
+        private final CashbackService cashbackService;
+
+        @Autowired
+        public PurchaseCashbackParser(GroupService groupService, PurchaseService purchaseService, CashbackService cashbackService) {
+            this.groupService = groupService;
+            this.purchaseService = purchaseService;
+            this.cashbackService = cashbackService;
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return List.of(Command.purchase, Command.cashBack);
+        }
+
+        @Override
+        public void process(List<String> input) {
+            try {
+                LocalDate date = LocalDate.now();
+                int commandIndex = 0;
+
+                if (DateUtil.isDate(input.get(0))) {
+                    date = DateUtil.getDate(input.get(0));
+                    commandIndex = 1;
+                }
+                Command command = Command.of(input.get(commandIndex));
+                String payerMember = input.get(commandIndex + 1);
+                BigDecimal totalPrice = new BigDecimal(input.get(commandIndex + 3)).setScale(2, RoundingMode.DOWN);
+
+                Set<String> temporary = new TreeSet<>();
+                process(input, commandIndex, RegexPatterns.PLUS_PATTERN, temporary::addAll);
+                process(input, commandIndex, RegexPatterns.MINUS_PATTERN, temporary::removeAll);
+
+                switch (command) {
+                    case purchase -> purchaseService.process(date, payerMember, totalPrice, temporary);
+                    case cashBack -> cashbackService.process(date, payerMember, totalPrice, temporary);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Illegal command arguments");
+            }
+        }
+
+        private void process(List<String> input, int index, Pattern PATTERN, Consumer<List<String>> action) {
+            Map<Boolean, List<String>> map = input.stream()
+                    .skip(index + 4)
+                    .flatMap(it -> PATTERN.matcher(it).results())
+                    .map(MatchResult::group)
+                    .collect(Collectors.partitioningBy(it -> RegexPatterns.GROUP_PATTERN.matcher(it).matches()));
+
+            List<String> gropList = map.getOrDefault(true, Collections.emptyList());
+            Set<String> namesFromGroup = groupService.ungroupNames(gropList);
+
+            List<String> names = map.getOrDefault(false, Collections.emptyList());
+            List<String> finalNames = new ArrayList<>();
+            finalNames.addAll(names);
+            finalNames.addAll(namesFromGroup);
+            action.accept(finalNames);
+        }
+    }
+
+  learner_created: true
+- name: src/splitter/CommandProcessor.java
+  visible: true
+  text: |
+    package splitter;
+
+    import splitter.Command;
+
+    import java.util.Collections;
+    import java.util.List;
+
+    @FunctionalInterface
+    public interface CommandProcessor {
+
+        void process(List<String> input);
+
+        default List<Command> getCommand() {
+            return Collections.emptyList();
+        }
+    }
+  learner_created: true
+- name: src/splitter/service/CashbackService.java
+  visible: true
+  text: |-
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.AmountCalculator;
+    import splitter.entity.Balance;
+    import splitter.entity.Members;
+    import splitter.entity.Transactions;
+    import splitter.repository.BalanceRepository;
+    import splitter.repository.MembersRepository;
+    import splitter.repository.TransactionsRepository;
+
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+    import java.util.*;
+
+    @Service
+    public class CashbackService {
+
+        private final BalanceRepository balanceRepository;
+        private final MembersRepository membersRepository;
+        private final TransactionsRepository transactionsRepository;
+        private final BalanceService balanceService;
+
+        @Autowired
+        public CashbackService(BalanceRepository balanceRepository, MembersRepository membersRepository, BorrowRepayService borrowRepayService, TransactionsRepository transactionsRepository, BalanceService balanceService) {
+            this.balanceRepository = balanceRepository;
+            this.membersRepository = membersRepository;
+            this.transactionsRepository = transactionsRepository;
+            this.balanceService = balanceService;
+        }
+
+        @Transactional
+        public void process(LocalDate date, String payerMember, BigDecimal totalPrice, Set<String> temporary) {
+            BigDecimal quantityPerson = new BigDecimal(temporary.size());
+            AmountCalculator calculator = new AmountCalculator(totalPrice, temporary, payerMember);
+
+            BigDecimal sharedAmount = calculator.calcSharedAmount(quantityPerson);
+            boolean haveRemainder = calculator.hasRemainder(sharedAmount, quantityPerson);
+            Deque<String> extraPayers = calculator.calcExtraPayers(haveRemainder, sharedAmount, quantityPerson);
+
+            Optional<Members> findCompany = membersRepository.findByMemberName(payerMember);
+            Members company = findCompany.orElseGet(() -> membersRepository.save(new Members(payerMember))); // to
+
+            temporary.forEach(name -> {
+                //name - from
+                Optional<Members> findPerson = membersRepository.findByMemberName(name);
+                Members person = findPerson.orElseGet(() -> membersRepository.save(new Members(name)));
+
+                BigDecimal currentAmount = balanceService.getCurrentAmount(person, company);
+                BigDecimal newAmount = currentAmount.subtract(sharedAmount);
+                if (haveRemainder && name.equals(extraPayers.peek())) {
+                    newAmount = newAmount.subtract(calculator.getMinimumAmount());
+                    extraPayers.remove();
+                }
+                balanceRepository.save(new Balance(person, company, date, newAmount));
+                transactionsRepository.save(new Transactions("cashback", date, person, company, newAmount));
+            });
+        }
+    }
+  learner_created: true
+- name: testDB.mv.db.mv.db
+  visible: true
+  learner_created: true
+- name: src/splitter/repository/GroupsRepository.java
+  visible: true
+  text: |
+    package splitter.repository;
+
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import splitter.entity.Groups;
+
+    import java.util.Optional;
+
+    public interface GroupsRepository extends JpaRepository<Groups, Long> {
+
+        Optional<Groups> findByGroupName(String groupName);
+        Groups getByGroupName(String groupName);
+
+    }
+  learner_created: true
+- name: src/splitter/util/NameKey.java
+  visible: true
+  text: |
+    package splitter.util;
+
+    import java.util.stream.Collectors;
+    import java.util.stream.Stream;
+
+    public record NameKey(String personOne, String personTwo) {
+
+        public static boolean isKeyEquals(String personOne, String personTwo) {
+            String sortedKey = Stream.of(personOne, personTwo)
+                    .sorted()
+                    .collect(Collectors.joining());
+            String inputKey = personOne + personTwo;
+            return sortedKey.equals(inputKey);
+        }
+    }
+  learner_created: true
+- name: src/splitter/service/PurchaseService.java
+  visible: true
+  text: |+
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.util.NameKey;
+    import splitter.AmountCalculator;
+    import splitter.entity.Balance;
+    import splitter.entity.Members;
+    import splitter.entity.Transactions;
+    import splitter.repository.BalanceRepository;
+    import splitter.repository.MembersRepository;
+    import splitter.repository.TransactionsRepository;
+
+    import java.math.*;
+    import java.time.LocalDate;
+    import java.util.*;
+
+    @Service
+    public class PurchaseService {
+
+        private final BalanceRepository balanceRepository;
+        private final MembersRepository membersRepository;
+        private final TransactionsRepository transactionsRepository;
+        private final BalanceService balanceService;
+
+        @Autowired
+        public PurchaseService(BalanceRepository balance, MembersRepository members, TransactionsRepository transactions, BalanceService balanceService) {
+            this.balanceRepository = balance;
+            this.membersRepository = members;
+            this.transactionsRepository = transactions;
+            this.balanceService = balanceService;
+        }
+
+        @Transactional
+        public void process(LocalDate date, String payerPerson, BigDecimal totalPrice, Set<String> temporary) {
+            BigDecimal quantityPerson = new BigDecimal(temporary.size()); // 3 count members of transaction
+            AmountCalculator calculator = new AmountCalculator(totalPrice, temporary, payerPerson);
+
+            BigDecimal sharedAmount = calculator.calcSharedAmount(quantityPerson);
+            boolean haveRemainder = calculator.hasRemainder(sharedAmount, quantityPerson);
+            Deque<String> extraPayers = calculator.calcExtraPayers(haveRemainder, sharedAmount, quantityPerson);
+            extraPayers.remove(payerPerson);
+
+            Optional<Members> findPayerPerson = membersRepository.findByMemberName(payerPerson);
+            Members personOne = findPayerPerson.orElseGet(() -> membersRepository.save(new Members(payerPerson)));
+
+            temporary.stream()
+                    .sorted()
+                    .filter(name -> !name.equals(payerPerson))
+                    .forEach(name -> {
+                        Optional<Members> findPersonTwo = membersRepository.findByMemberName(name);
+                        Members personTwo = findPersonTwo.orElseGet(() -> membersRepository.save(new Members(name)));
+
+                        boolean keyEquals = NameKey.isKeyEquals(payerPerson, name);
+                        var mainPerson = keyEquals ? personOne : personTwo;
+                        var secondPerson = keyEquals ? personTwo : personOne;
+
+                        BigDecimal currentAmount = balanceService.getCurrentAmount(mainPerson, secondPerson);
+
+                        BigDecimal newAmount;
+                        newAmount = keyEquals ? currentAmount.subtract(sharedAmount) : currentAmount.add(sharedAmount);
+
+                        if (haveRemainder && !extraPayers.isEmpty()) {
+                            newAmount = keyEquals ? newAmount.subtract(calculator.getMinimumAmount()) : newAmount.add(calculator.getMinimumAmount());
+                            extraPayers.remove();
+
+                        }
+                        balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));
+                        transactionsRepository.save(new Transactions("purchase", date, personTwo, personOne, newAmount));
+                    });
+        }
+    }
+
+
+
+
+
+
+  learner_created: true
+- name: src/splitter/service/WriteOffService.java
+  visible: true
+  text: |
+    package splitter.service;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import splitter.Command;
+    import splitter.CommandProcessor;
+    import splitter.repository.BalanceRepository;
+    import splitter.repository.TransactionsRepository;
+    import splitter.util.DateUtil;
+
+    import java.time.LocalDate;
+    import java.util.Collections;
+    import java.util.List;
+
+    @Service
+    public class WriteOffService implements CommandProcessor {
+
+        private final BalanceRepository balanceRepository;
+        private final TransactionsRepository transactionsRepository;
+
+        @Autowired
+        public WriteOffService(BalanceRepository balanceRepository, TransactionsRepository transactionsRepository) {
+            this.balanceRepository = balanceRepository;
+            this.transactionsRepository = transactionsRepository;
+        }
+
+        @Override
+        @Transactional
+        public void process(List<String> input) {
+            LocalDate date = DateUtil.isDate(input.get(0)) ? DateUtil.getDate(input.get(0)) : LocalDate.now();
+            balanceRepository.deleteByDateLessThanEqual(date);
+            transactionsRepository.deleteByDateLessThanEqual(date);
+
+        }
+
+        @Override
+        public List<Command> getCommand() {
+            return Collections.singletonList(Command.writeOff);
+        }
+    }
+  learner_created: true
+- name: src/splitter/service/PerfectService.java
+  visible: true
+  learner_created: true
+- name: src/splitter/entity/Balance.java
+  visible: true
+  text: |
+    package splitter.entity;
+
+    import javax.persistence.*;
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+
+    @Entity
+    public class Balance {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "balance_id")
+        private Long balanceId;
+
+        @ManyToOne
+        @JoinColumn(name = "from_member_id")
+        private Members fromMember;
+
+        @ManyToOne
+        @JoinColumn(name = "to_member_id")
+        private Members toMember;
+
+        private LocalDate date;
+
+        private BigDecimal amount;
+
+        public Balance(Members fromMember, Members toMember, LocalDate date, BigDecimal amount) {
+            this.fromMember = fromMember;
+            this.toMember = toMember;
+            this.date = date;
+            this.amount = amount;
+        }
+
+        public Balance() {}
+
+        public Members getFromMember() {
+            return fromMember;
+        }
+
+        public Members getToMember() {
+            return toMember;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public BigDecimal getAmount() {
+            return amount;
+        }
+
+        @Override
+        public String toString() {
+            return "Balance {" +
+                    "balanceId= " + balanceId +
+                    ", fromMember= " + fromMember +
+                    ", toMember= " + toMember +
+                    ", date= " + date +
+                    ", amount= " + amount +
+                    '}';
+        }
+    }
+  learner_created: true
+- name: src/splitter/ResultsHolder.java
+  visible: true
+  learner_created: true
+- name: testDB97.mv.db.mv.db
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11723#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Sun, 01 Oct 2023 04:46:55 UTC"
 record: -1

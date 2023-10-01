@@ -17,11 +17,13 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SharedBillsSplitterTestStage5 extends StageTest {
+public class SharedBillsSplitterTestStage6 extends StageTest {
 
     public static final String FILTERED_BALANCE_FEEDBACK = "Program should output balance result for persons who contains if filter. However owes values should be the same as if balance were unfiltered.";
+    public static final String BALANCE_PERFECT_FEEDBACK = "Your program should reduce repayments count for balancePerfect";
     private static final String UNKNOWN_COMMAND = "Unknown command";
     private static final String EXIT_ERROR = "Your program should stop after exit command";
     private static final String HELP_ERROR = "Help command should print all commands line by line in natural order";
@@ -45,9 +47,30 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
 
     private final String databasePath;
 
-    public SharedBillsSplitterTestStage5() {
+    public SharedBillsSplitterTestStage6() {
 
         databasePath = "../testDB" + ".mv.db";
+    }
+
+    private static long getLinesCount(String balancePerfectResult) {
+
+        return balancePerfectResult.lines()
+                                   .filter(Predicate.not(String::isBlank))
+                                   .count();
+    }
+
+    private static boolean isBalanceResultOk(String keyPerson, String result, BigDecimal sumBalance) {
+
+        Optional<BigDecimal> sum = Arrays.stream(result.split("\n"))
+                                         .filter(it -> it.contains(keyPerson))
+                                         .map(it -> {
+                                             String[] split = it.split("\\s+");
+                                             Character sign = it.startsWith(keyPerson) ? '+' : '-';
+                                             return sign + split[split.length - 1];
+                                         })
+                                         .map(BigDecimal::new)
+                                         .reduce(BigDecimal::add);
+        return sumBalance.compareTo(sum.orElse(BigDecimal.ZERO)) == 0;
     }
 
     private static boolean equalsByLines(String sample, String linesStr) {
@@ -276,14 +299,7 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
 
                 new TestCase<String>().setDynamicTesting(() -> {
                     {
-                        String[] response = {
-                            "Ann owes Bob 14.00",
-                            "Chuck owes Bob 7.00",
-                            "Diana owes Bob 5.00",
-                            "Diana owes Chuck 26.00",
-                            "Elon owes Diana 12.00"
-                        };
-
+                        String[] response = {"Ann owes Bob 14.00", "Chuck owes Bob 7.00", "Diana owes Bob 5.00", "Diana owes Chuck 26.00", "Elon owes Diana 12.00"};
                         TestedProgram main = new TestedProgram();
                         ((MainMethodExecutor) main.getProgramExecutor()).setUseSeparateClassLoader(false);
                         String output;
@@ -387,7 +403,6 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
                     }
                     return CheckResult.wrong(WRONG_CALCULATIONS);
                 }),
-
 
                 new TestCase<String>().setDynamicTesting(() -> {
                     TestedProgram main = new TestedProgram();
@@ -716,7 +731,6 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
                     main.start();
                     main.execute("writeOff");
                     main.execute("group create BOBTEAM (Frank, Bob)");
-                    main.execute("group create AGROUP (Bob, -Bob)");
                     main.execute("purchase Ann coffee 12.00 (Chuck, Ann, Bob)");
                     {
                         String balanceResult = main.execute("balance close (Bob, Ann)");
@@ -741,6 +755,87 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
                         if (!balanceResult.contains("not exist")) {
                             return CheckResult.wrong("Program should output \"Group does not exist\" if the balance command is entered on a group that has not been created.");
                         }
+                    }
+                    main.execute("exit");
+                    return CheckResult.correct();
+                }),
+
+                new TestCase<String>().setDynamicTesting(() -> {
+                    TestedProgram main = new TestedProgram();
+                    ((MainMethodExecutor) main.getProgramExecutor()).setUseSeparateClassLoader(false);
+                    main.start();
+                    strToLinesTrimmed("""
+                        writeOff
+                        borrow Bob Chuck 100
+                        borrow Chuck Diana 100
+                        borrow Chuck Bob 30
+                        borrow Diana Bob 100""")
+                            .forEach(main::execute);
+                    String balancePerfectResult = main.execute("balancePerfect close");
+                    if (getLinesCount(balancePerfectResult) >= 3) {
+                        return CheckResult.wrong(BALANCE_PERFECT_FEEDBACK);
+                    }
+                    if (equalsByLines(balancePerfectResult, "Chuck owes Bob 30.00") ||
+                            equalsByLines(balancePerfectResult, "" +
+                                    "Chuck owes Diana 30.00\n" +
+                                    "Diana owes Bob 30.00")) {
+                        main.execute("exit");
+                        return CheckResult.correct();
+                    }
+                    return CheckResult.wrong(BALANCE_PERFECT_FEEDBACK);
+                }),
+
+                new TestCase<String>().setDynamicTesting(() -> {
+                    Random random = new Random();
+                    Random RANDOM_DETERM = new Random(42);
+                    List<String> persons = List.of("Andy", "Bobby", "Claire", "Diana", "Eagle", "Forb");
+                    String keyPerson = persons.get(random.nextInt(persons.size()));
+                    BigDecimal keyBalanceBorrow = BigDecimal.ZERO;
+                    BigDecimal keyBalanceRepay = BigDecimal.ZERO;
+                    TestedProgram main = new TestedProgram();
+                    ((MainMethodExecutor) main.getProgramExecutor()).setUseSeparateClassLoader(false);
+                    main.start();
+                    main.execute("writeOff");
+                    for (int i = 0; i < 100; i++) {
+                        String personFrom = persons.get(RANDOM_DETERM.nextInt(persons.size()));
+                        String personTo = persons.get(RANDOM_DETERM.nextInt(persons.size()));
+                        if (personFrom.equalsIgnoreCase(personTo)) {
+                            continue;
+                        }
+                        Commands command;
+                        BigDecimal amount = new BigDecimal(String.format("%d.%d", RANDOM_DETERM.nextInt(200), random.nextInt(99)));
+                        if (RANDOM_DETERM.nextBoolean()) {
+                            command = Commands.borrow;
+                            if (personFrom.equals(keyPerson)) {
+                                keyBalanceBorrow = keyBalanceBorrow.add(amount);
+                            }
+                            if (personTo.equals(keyPerson)) {
+                                keyBalanceBorrow = keyBalanceBorrow.subtract(amount);
+                            }
+                        } else {
+                            command = Commands.repay;
+                            if (personFrom.equals(keyPerson)) {
+                                keyBalanceRepay = keyBalanceRepay.add(amount);
+                            }
+                            if (personTo.equals(keyPerson)) {
+                                keyBalanceRepay = keyBalanceRepay.subtract(amount);
+                            }
+                        }
+                        String line = String.format("%s %s %s %s", command, personFrom, personTo, amount);
+                        main.execute(line);
+                    }
+                    String balanceResult = main.execute("balance close");
+                    boolean isOkBalance = isBalanceResultOk(keyPerson, balanceResult, keyBalanceBorrow.subtract(keyBalanceRepay));
+                    if (!isOkBalance) {
+                        return CheckResult.wrong("Command balance: " + WRONG_CALCULATIONS);
+                    }
+                    String balancePerfectResult = main.execute("balancePerfect close");
+                    boolean isOkBalancePerfect = isBalanceResultOk(keyPerson, balancePerfectResult, keyBalanceBorrow.subtract(keyBalanceRepay));
+                    if (!isOkBalancePerfect) {
+                        return CheckResult.wrong("Command balancePerfect: " + WRONG_CALCULATIONS);
+                    }
+                    if (getLinesCount(balancePerfectResult) >= getLinesCount(balanceResult)) {
+                        return CheckResult.wrong(BALANCE_PERFECT_FEEDBACK);
                     }
                     main.execute("exit");
                     return CheckResult.correct();
@@ -829,6 +924,7 @@ public class SharedBillsSplitterTestStage5 extends StageTest {
         purchase,
         secretSanta,
         cashBack,
-        writeOff
+        writeOff,
+        balancePerfect
     }
 }

@@ -2,7 +2,9 @@ package splitter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import splitter.util.DateUtil;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -27,14 +29,18 @@ public class CommandParser {
     }
 
     boolean parseUserInput(String input) {
-        var command = Command.of(input);
+        var inputList = List.of(input.split(INPUT_DELIMITER));
+        int commandIndex = 0;
+        if (DateUtil.isDate(inputList.get(0))) {
+            commandIndex = 1;
+        }
+        var command = Command.of(inputList.get(commandIndex));
         if (command == Command.exit) {
             return true;
         } else if (command == null) {
             System.out.println("Unknown command. Print help to show commands list");
             return false;
         }
-        var inputList = List.of(input.split(INPUT_DELIMITER));
         processors.getOrDefault(command, System.err::println).process(inputList);
         return false;
     }

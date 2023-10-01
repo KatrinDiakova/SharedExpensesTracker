@@ -6,10 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import splitter.AmountCalculator;
 import splitter.entity.Balance;
 import splitter.entity.Members;
-import splitter.entity.Transactions;
 import splitter.repository.BalanceRepository;
 import splitter.repository.MembersRepository;
-import splitter.repository.TransactionsRepository;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,14 +19,13 @@ public class CashbackService {
 
     private final BalanceRepository balanceRepository;
     private final MembersRepository membersRepository;
-    private final TransactionsRepository transactionsRepository;
     private final BalanceService balanceService;
 
     @Autowired
-    public CashbackService(BalanceRepository balanceRepository, MembersRepository membersRepository, BorrowRepayService borrowRepayService, TransactionsRepository transactionsRepository, BalanceService balanceService) {
+    public CashbackService(BalanceRepository balanceRepository, MembersRepository membersRepository,
+                                                                BalanceService balanceService) {
         this.balanceRepository = balanceRepository;
         this.membersRepository = membersRepository;
-        this.transactionsRepository = transactionsRepository;
         this.balanceService = balanceService;
     }
 
@@ -55,7 +53,6 @@ public class CashbackService {
                 extraPayers.remove();
             }
             balanceRepository.save(new Balance(person, company, date, newAmount));
-            transactionsRepository.save(new Transactions("cashback", date, person, company, newAmount));
         });
     }
 }

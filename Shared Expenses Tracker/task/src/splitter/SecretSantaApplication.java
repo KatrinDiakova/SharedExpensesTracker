@@ -9,7 +9,3 @@ public class SecretSantaApplication {
         SpringApplication.run(SecretSantaApplication.class, args);
     }
 }
-//    group create BOBTEAM (Frank, Bob)
-//    group create AGROUP (Bob, -Bob)
-//    purchase Ann coffee 12.00 (Chuck, Ann, Bob)
-//    balance close (Bob, Ann)

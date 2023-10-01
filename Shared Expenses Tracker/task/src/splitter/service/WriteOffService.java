@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import splitter.Command;
 import splitter.CommandProcessor;
 import splitter.repository.BalanceRepository;
-import splitter.repository.TransactionsRepository;
+//import splitter.repository.TransactionsRepository;
 import splitter.util.DateUtil;
 
 import java.time.LocalDate;
@@ -17,12 +17,13 @@ import java.util.List;
 public class WriteOffService implements CommandProcessor {
 
     private final BalanceRepository balanceRepository;
-    private final TransactionsRepository transactionsRepository;
+    //private final TransactionsRepository transactionsRepository;
 
     @Autowired
-    public WriteOffService(BalanceRepository balanceRepository, TransactionsRepository transactionsRepository) {
+    public WriteOffService(BalanceRepository balanceRepository) {
+                           //TransactionsRepository transactionsRepository) {
         this.balanceRepository = balanceRepository;
-        this.transactionsRepository = transactionsRepository;
+        //this.transactionsRepository = transactionsRepository;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class WriteOffService implements CommandProcessor {
     public void process(List<String> input) {
         LocalDate date = DateUtil.isDate(input.get(0)) ? DateUtil.getDate(input.get(0)) : LocalDate.now();
         balanceRepository.deleteByDateLessThanEqual(date);
-        transactionsRepository.deleteByDateLessThanEqual(date);
+        //transactionsRepository.deleteByDateLessThanEqual(date);
 
     }
 

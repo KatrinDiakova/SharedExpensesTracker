@@ -53,10 +53,14 @@ public class Balance {
     public String toString() {
         return "Balance {" +
                 "balanceId= " + balanceId +
-                ", fromMember= " + fromMember +
-                ", toMember= " + toMember +
                 ", date= " + date +
+                ", fromMember= " + fromMember.getMemberName() +
+                ", toMember= " + toMember.getMemberName() +
                 ", amount= " + amount +
                 '}';
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

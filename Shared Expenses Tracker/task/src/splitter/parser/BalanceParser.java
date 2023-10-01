@@ -6,6 +6,7 @@ import splitter.Command;
 import splitter.CommandProcessor;
 import splitter.service.BalanceService;
 import splitter.service.GroupService;
+import splitter.service.PerfectService;
 import splitter.util.DateUtil;
 import splitter.util.RegexPatterns;
 
@@ -30,7 +31,7 @@ public class BalanceParser implements CommandProcessor {
 
     @Override
     public List<Command> getCommand() {
-        return Collections.singletonList(Command.balance);
+        return List.of(Command.balance, Command.balancePerfect);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class BalanceParser implements CommandProcessor {
                 date = DateUtil.getDate(input.get(0));
                 commandIndex = 1;
             }
-
+            Command command = Command.of(input.get(commandIndex));
             if (input.size() > commandIndex + 1) {
                 Optional.ofNullable(input.get(commandIndex + 1))
                         .filter(it -> Arrays.stream(BalanceType.values())
@@ -55,8 +56,10 @@ public class BalanceParser implements CommandProcessor {
             process(input, commandIndex, RegexPatterns.PLUS_PATTERN, temporary::addAll);
             process(input, commandIndex, RegexPatterns.MINUS_PATTERN, temporary::removeAll);
 
-            balanceService.process(date, balanceType, temporary);
+            balanceService.process(date, balanceType, temporary, command);
+
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Illegal command arguments");
         }
     }

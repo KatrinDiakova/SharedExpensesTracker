@@ -2,6 +2,7 @@ package splitter;
 /*
  * [date] borrow PersonOne PersonTwo amount
  * [date] repay PersonOne PersonTwo amount
+ * [date] balancePerfect [open|close]
  * [date] balance [open|close] [(list of [+|-] persons | GROUPS)]
  * group [create|add|remove|show] GROUPNAME [(list of [+|-] persons | GROUPS)]
  * [date] purchase Person itemName amount [(list of [+|-] persons | GROUPS)]

@@ -6,12 +6,11 @@ import splitter.util.NameKey;
 import splitter.Command;
 import splitter.entity.Balance;
 import splitter.entity.Members;
-import splitter.entity.Transactions;
+//import splitter.entity.Transactions;
 import splitter.repository.*;
 
 import java.math.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,13 +18,15 @@ public class BorrowRepayService {
 
     private final MembersRepository membersRepository;
     private final BalanceRepository balanceRepository;
-    private final TransactionsRepository transactionsRepository;
+   // private final TransactionsRepository transactionsRepository;
     private final BalanceService balanceService;
 
-    public BorrowRepayService(MembersRepository membersRepository, BalanceRepository balanceRepository, TransactionsRepository transactionsRepository, BalanceService balanceService) {
+    public BorrowRepayService(MembersRepository membersRepository, BalanceRepository balanceRepository,
+                              //TransactionsRepository transactionsRepository,
+                              BalanceService balanceService) {
         this.membersRepository = membersRepository;
         this.balanceRepository = balanceRepository;
-        this.transactionsRepository = transactionsRepository;
+        //this.transactionsRepository = transactionsRepository;
         this.balanceService = balanceService;
     }
 
@@ -45,7 +46,7 @@ public class BorrowRepayService {
         BigDecimal newAmount = calculateNewAmount(command, amount, currentAmount, keyEquals);
 
         balanceRepository.save(new Balance(mainPerson, secondPerson, date, newAmount));
-        transactionsRepository.save(new Transactions(command.name(), date, personOne, personTwo, amount));
+        //transactionsRepository.save(new Transactions(command.name(), date, personOne, personTwo, amount));
     }
 
     private BigDecimal calculateNewAmount(Command command, BigDecimal amount, BigDecimal currentAmount, boolean keyEquals) {

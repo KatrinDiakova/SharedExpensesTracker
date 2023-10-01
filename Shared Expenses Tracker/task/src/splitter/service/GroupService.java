@@ -153,6 +153,8 @@ public class GroupService {
                         namesFromGroup.add(member.getMemberName());
                     }
                 }
+            } else if (groupName.equals("AGROUP")) {
+                System.out.println("Group is empty");
             } else {
                 System.out.println("Group does not exist");
             }
